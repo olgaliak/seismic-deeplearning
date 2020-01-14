@@ -20,6 +20,7 @@ dependencies:
   - pytest
   - papermill>=1.0.1
   - pip:
+    - Pillow==6.2.2
     - segyio==1.8.8
     - pytorch-ignite==0.3.0.dev20191105 # pre-release until stable available
     - fire==0.2.1
