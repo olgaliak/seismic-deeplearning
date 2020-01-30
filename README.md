@@ -118,9 +118,8 @@ mkdir -p "$data_dir"
 
 Once you've downloaded the data set, make sure to create an empty `splits` directory, under the downloaded `data` directory; you can re-use the same data directory as the one for Penobscot dataset created earlier. This is where your training/test/validation splits will be saved.
 
-```
-cd data
-mkdir splits
+``` bash
+mkdir $data_dir/data/splits
 ```
 
 At this point, your `data` directory tree should look like this:
