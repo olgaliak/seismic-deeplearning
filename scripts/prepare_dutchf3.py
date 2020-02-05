@@ -36,16 +36,21 @@ def _write_split_files(splits_path, train_list, test_list, loader_type):
     file_object.close()
 
 
-def _get_aline_range(aline, per_val):
-    # Inline sections
-    test_aline = math.floor(aline * per_val / 2)
-    test_aline_range = itertools.chain(range(0, test_aline), range(aline - test_aline, aline))
-    train_aline_range = range(test_aline, aline - test_aline)
+def _get_aline_range(aline, per_val, slice_steps):
+    try:
+        if slice_steps < 0:
+            raise ValueError('slice_steps cannot be a negative number')
+        # Inline and Crossline sections
+        test_aline = math.floor(aline * per_val / 2)
+        test_aline_range = itertools.chain(range(0, test_aline), range(aline - test_aline, aline, slice_steps))
+        train_aline_range = range(test_aline, aline - test_aline, slice_steps)
 
-    return train_aline_range, test_aline_range
+        return train_aline_range, test_aline_range
+    except (Exception, ValueError):
+        raise
 
 
-def split_section_train_val(data_dir, per_val=0.2, log_config=None):
+def split_section_train_val(data_dir, per_val=0.2, log_config=None, slice_steps=1):
     """Generate train and validation files for Netherlands F3 dataset.
 
     Args:
@@ -69,12 +74,18 @@ def split_section_train_val(data_dir, per_val=0.2, log_config=None):
 
     iline, xline, _ = labels.shape
     # Inline sections
-    train_iline_range, test_iline_range = _get_aline_range(iline, per_val)
+    try:
+        train_iline_range, test_iline_range = _get_aline_range(iline, per_val, slice_steps)
+    except RuntimeError as re:
+        logger.error(re)
     train_i_list = ["i_" + str(i) for i in train_iline_range]
     test_i_list = ["i_" + str(i) for i in test_iline_range]
 
     # Xline sections
-    train_xline_range, test_xline_range = _get_aline_range(xline, per_val)
+    try:
+        train_xline_range, test_xline_range = _get_aline_range(xline, per_val, slice_steps)
+    except RuntimeError as re:
+        logger.error(re)
     train_x_list = ["x_" + str(x) for x in train_xline_range]
     test_x_list = ["x_" + str(x) for x in test_xline_range]
 
@@ -86,15 +97,18 @@ def split_section_train_val(data_dir, per_val=0.2, log_config=None):
     _write_split_files(splits_path, train_list, test_list, "section")
 
 
-def split_patch_train_val(data_dir, stride, patch, per_val=0.2, log_config=None):
+def split_patch_train_val(data_dir, output_dir, label_file, stride, patch, slice_steps=1, per_val=0.2, log_config=None):
     """Generate train and validation files for Netherlands F3 dataset.
 
     Args:
-        data_dir (str): data directory path
+        output_dir (str): directory under input_dir to store the split files
+        label_file (str): npy files with labels. Stored in input_dir
         stride (int): stride to use when sectioning of the volume
         patch (int): size of patch to extract
-        per_val (float, optional): the fraction of the volume to use for validation.
+        per_val (float, optional):  the fraction of the volume to use for validation.
             Defaults to 0.2.
+        log_config (str): path to log configurations
+        slice_steps (int): number of slices to be skipped. Defaults to 1.
     """
 
     if log_config is not None:
@@ -112,10 +126,16 @@ def split_patch_train_val(data_dir, stride, patch, per_val=0.2, log_config=None)
 
     iline, xline, depth = labels.shape
     # Inline sections
-    train_iline_range, test_iline_range = _get_aline_range(iline, per_val)
+    try:
+        train_iline_range, test_iline_range = _get_aline_range(iline, per_val, slice_steps)
+    except RuntimeError as re:
+        logger.error(re)
 
     # Xline sections
-    train_xline_range, test_xline_range = _get_aline_range(xline, per_val)
+    try:
+        train_xline_range, test_xline_range = _get_aline_range(xline, per_val, slice_steps)
+    except RuntimeError as re:
+        logger.error(re)
 
     # Generate patches from sections
     # Process inlines
@@ -273,25 +293,38 @@ class SplitTrainValCLI(object):
         """
         return split_section_train_val(data_dir, per_val=per_val, log_config=log_config)
 
-    def patch(self, data_dir, stride, patch, per_val=0.2, log_config="logging.conf"):
+    def patch(self, label_file, stride, patch,
+                per_val=0.2, log_config="train/deepseismic/configs/logging.conf",
+                input=None, output_dir=None, slice_steps=1):
         """Generate patch based train and validation files for Netherlands F3 dataset.
 
         Args:
-            data_dir (str): data directory path
+            input (str): data directory path
+            output_dir (str): directory under input to store the split files
+            label_file (str): npy files with labels. Stored in input_dir
             stride (int): stride to use when sectioning of the volume
             patch (int): size of patch to extract
             per_val (float, optional):  the fraction of the volume to use for validation.
                 Defaults to 0.2.
             log_config (str): path to log configurations
+            slice_steps (int): number of slices to be skipped. Defaults to 1.
         """
-        return split_patch_train_val(data_dir, stride, patch, per_val=per_val, log_config=log_config)
+        if input is not None:
+            label_file = path.join(input, label_file)
+        output_dir = path.join(input, output_dir)
+        return split_patch_train_val(data_dir=input, output_dir=output_dir, label_file=label_file,
+                        stride=stride, patch=patch,
+                        per_val=per_val, log_config=log_config,
+                        slice_steps=slice_steps)
 
 
 if __name__ == "__main__":
     """Example:
     python prepare_data.py split_train_val section --data-dir=/mnt/dutch
     or
-    python prepare_data.py split_train_val patch --data-dir=/mnt/dutch --stride=50 --patch=100
+    python prepare_dutchf3.py split_train_val patch --output_dir=splits \
+                    --input=data/ --slice_steps=2 --stride=50 --patch=100 \
+                    --label_file=label_file.npy
 
     """
     fire.Fire(
