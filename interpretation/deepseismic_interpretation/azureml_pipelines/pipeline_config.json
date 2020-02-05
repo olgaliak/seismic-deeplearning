@@ -1,0 +1,41 @@
+{
+    "step1":
+    {
+        "type": "PythonScriptStep",
+        "name": "prepare splits step",
+        "script": "prepare_splits.py",
+        "input_datareference_path": "normalized_data/",
+        "input_datareference_name": "normalized_data_conditioned",
+        "input_dataset_name": "normalizeddataconditioned",
+        "source_directory": "train/",
+        "arguments": [
+                "--label_paths", "faults/listric1", "faults/listric5",
+                "--splits_paths", "splits/listric1", "splits/listric5",
+                "--stride=25",
+                "--patch=100",
+                "--log_config", "deepseismic/configs/logging.conf"],
+        "requirements": "requirements.txt",
+        "node_count": 1,
+        "processes_per_node": 1,
+        "base_image": "pytorch/pytorch"
+    },
+    "step2":
+    {
+        "type": "MpiStep",
+        "name": "train step",
+        "script": "train_poc.py",
+        "input_datareference_path": "normalized_data/",
+        "input_datareference_name": "normalized_data_conditioned",
+        "input_dataset_name": "normalizeddataconditioned",
+        "source_directory": "train/",
+        "arguments": [
+                      "--train_data_paths", "conditioned/listric1", "conditioned/listric5", 
+                      "--label_paths", "faults/listric1", "faults/listric5",
+                      "--splits_paths", "splits/listric1", "splits/listric5"
+                      ],
+        "requirements": "requirements.txt",
+        "node_count": 1,
+        "processes_per_node": 1,
+        "base_image": "pytorch/pytorch"
+    }
+}
