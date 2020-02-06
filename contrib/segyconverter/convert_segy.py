@@ -9,10 +9,12 @@ import numpy as np
 import utils.segyextract as segyextract
 import utils.normalize_cube as normalize_cube
 
+
 def _normalize(output_dir, stddev_file, k, min_range, max_range):
     """
     Normalization step on all files in output_dir
     :param str output_dir: Directory path of all npy files to normalize
+    :param str stddev_file: txt file containing standard deviation result
     :param int k: number of standard deviation to be used in normalization
     :param float min_range: minium range value
     :param float max_range: maximum range value
@@ -32,7 +34,7 @@ def _normalize(output_dir, stddev_file, k, min_range, max_range):
     npy_files = list(f for f in os.listdir(output_dir) if f.endswith('.npy'))
     for local_filename in npy_files:
         normalize_cube.normalize_file(os.path.join(output_dir, local_filename), stddev,
-            k, min_range, max_range)
+                                      k, min_range, max_range)
 
 
 def main(input_file, output_dir, prefix, iline=189, xline=193, metadata_only=False, stride=128, cube_size=-1, normalize=True, input=None):
@@ -57,7 +59,6 @@ def main(input_file, output_dir, prefix, iline=189, xline=193, metadata_only=Fal
 
     if len(input) > 0:
         output_dir = os.path.join(input, output_dir)
-        input_params.input = os.path.join(input, input_file)
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
 
@@ -65,9 +66,9 @@ def main(input_file, output_dir, prefix, iline=189, xline=193, metadata_only=Fal
         input_file, iline, xline)
 
     print("\tFast Lines: {} to {} ({} lines)".format(np.min(fast_indexes),
-        np.max(fast_indexes), len(fast_indexes)))
+          np.max(fast_indexes), len(fast_indexes)))
     print("\tSlow Lines: {} to {} ({} lines)".format(np.min(slow_indexes),
-        np.max(slow_indexes), len(slow_indexes)))
+          np.max(slow_indexes), len(slow_indexes)))
     print("\tSample Size: {}".format(sample_size))
     print("\tTrace Count: {}".format(len(trace_headers)))
     print("\tFirst five distinct Fast Line Indexes: {}".format(fast_indexes[0:5]))
@@ -80,11 +81,11 @@ def main(input_file, output_dir, prefix, iline=189, xline=193, metadata_only=Fal
         if cube_size == -1:
             # only generate on npy
             wrapped_processor_segy = segyextract.timewrapper(segyextract.process_segy_data_into_single_array,
-                                            input_file, output_dir, prefix, iline, xline)
+                                                             input_file, output_dir, prefix, iline, xline)
             process_time_segy = timeit.timeit(wrapped_processor_segy, number=1)
         else:
             wrapped_processor_segy = segyextract.timewrapper(segyextract.process_segy_data, input_file,
-                                                output_dir, prefix, stride=stride, n_points=cube_size)
+                                                             output_dir, prefix, stride=stride, n_points=cube_size)
             process_time_segy = timeit.timeit(wrapped_processor_segy, number=1)
         print(f"Completed SEG-Y converstion in: {process_time_segy}")
         # At this point, there should be npy files in the output directory + one file containing the std deviation found in the segy
@@ -102,17 +103,17 @@ if __name__ == '__main__':
                         required=True)
     parser.add_argument("--input_file", type=str, help="segy file path", required=True)
     parser.add_argument("--output_dir", type=str,
-                help="Output files are written to this directory", default='.')
+                        help="Output files are written to this directory", default='.')
     parser.add_argument("--metadata_only", action='store_true',
-                help="Only produce inline,xline metadata")
+                        help="Only produce inline,xline metadata")
     parser.add_argument("--iline", type=int, default=189,
-                help="segy file path")
+                        help="segy file path")
     parser.add_argument("--xline", type=int, default=193,
-                help="segy file path")
+                        help="segy file path")
     parser.add_argument("--cube_size", type=int, default=-1,
-                help="cube dimensions")
+                        help="cube dimensions")
     parser.add_argument("--stride", type=int, default=128,
-                help="stride")
+                        help="stride")
     parser.add_argument("--normalize", action='store_true', help="Normalization flag")
     parser.add_argument("--input", type=str, default="", help="Used when running in Azure ML Service - Path to input data")
     parser.add_argument("--output", type=str, default="", help="Used when running in Azure ML Service - Currently ignored")
@@ -121,4 +122,4 @@ if __name__ == '__main__':
     localfile = args.input_file
 
     main(args.input_file, args.output_dir, args.prefix, args.iline, args.xline,
-        args.metadata_only, args.stride, args.cube_size, args.normalize, args.input)
+         args.metadata_only, args.stride, args.cube_size, args.normalize, args.input)

@@ -2,24 +2,30 @@
 Test the extract functions against a variety of SEGY files and trace_header scenarioes
 """
 import os
-import shutil
 import pytest
 import numpy as np
 import utils.segyextract as segyextract
 import test_util
 import segyio
 
-#FILENAME = "./test/test_data/normalsegy.segy"
 FILENAME = "./contrib/segyconverter/test/test_data/normalsegy.segy"
 PREFIX = "normal"
 
-@pytest.mark.parametrize("filename, trace_count, first_inline, inline_count, first_xline, xline_count, depth", [("./contrib/segyconverter/test/test_data/normalsegy.segy", 8000, 10, 40, 100, 200, 10),
-                                                        ("./contrib/segyconverter/test/test_data/inlineerror.segy", 7309, 10, 40, 125, 200, 10),
-                                                        ("./contrib/segyconverter/test/test_data/xlineerror.segy", 7309, 10, 40, 125, 200, 10),
-                                                        ("./contrib/segyconverter/test/test_data/donuthole.segy", 7109, 10, 40, 100, 200, 10)
-                                                        ])
-def test_get_segy_metadata_should_return_correct_metadata(filename, trace_count, first_inline, inline_count, first_xline, xline_count, depth):
 
+@pytest.mark.parametrize("filename, trace_count, first_inline, inline_count, first_xline, xline_count, depth", [("./contrib/segyconverter/test/test_data/normalsegy.segy", 8000, 10, 40, 100, 200, 10),
+                         ("./contrib/segyconverter/test/test_data/inlineerror.segy", 7309, 10, 40, 125, 200, 10),
+                         ("./contrib/segyconverter/test/test_data/xlineerror.segy", 7309, 10, 40, 125, 200, 10),
+                         ("./contrib/segyconverter/test/test_data/donuthole.segy", 7109, 10, 40, 100, 200, 10)
+                         ])
+def test_get_segy_metadata_should_return_correct_metadata(filename, trace_count, first_inline, inline_count, first_xline, xline_count, depth):
+    """
+    Check that get_segy_metadata can correctly identify the sorting from the trace headers
+    :param dict tmpdir: pytest fixture for local test directory cleanup
+    :param str filename: SEG-Y filename
+    :param int inline: byte location for inline
+    :param int xline: byte location for crossline
+    :param int depth: number of samples
+    """
     # setup
     inline_byte_loc = 189
     xline_byte_loc = 193
@@ -38,15 +44,20 @@ def test_get_segy_metadata_should_return_correct_metadata(filename, trace_count,
     assert(trace_headers['slow'][0] == first_xline)
     assert(trace_headers['fast'][0] == first_inline)
 
+
 @pytest.mark.parametrize("filename,inline,xline,depth", [("./contrib/segyconverter/test/test_data/normalsegy.segy", 40, 200, 10),
-                                                        ("./contrib/segyconverter/test/test_data/inlineerror.segy", 40, 200, 10),
-                                                        ("./contrib/segyconverter/test/test_data/xlineerror.segy", 40, 200, 10),
-                                                        ("./contrib/segyconverter/test/test_data/donuthole.segy", 40, 200, 10)
-                                                        ])
+                         ("./contrib/segyconverter/test/test_data/inlineerror.segy", 40, 200, 10),
+                         ("./contrib/segyconverter/test/test_data/xlineerror.segy", 40, 200, 10),
+                         ("./contrib/segyconverter/test/test_data/donuthole.segy", 40, 200, 10)
+                         ])
 def test_process_segy_data_should_create_cube_size_equal_to_segy(tmpdir, filename, inline, xline, depth):
     """
     Create single npy file for segy and validate size
-    :param function filedir: pytest fixture for local test directory cleanup
+    :param dict tmpdir: pytest fixture for local test directory cleanup
+    :param str filename: SEG-Y filename
+    :param int inline: byte location for inline
+    :param int xline: byte location for crossline
+    :param int depth: number of samples
     """
     segyextract.process_segy_data_into_single_array(filename, tmpdir.strpath, PREFIX)
 
@@ -64,7 +75,7 @@ def test_process_segy_data_should_write_npy_files_for_n_equals_128_stride_64(tmp
     """
     Break data up into size n=128 size blocks and validate against original segy
     file. This size of block causes the code to write 1 x 4 npy files
-    :param function filedir: pytest fixture for local test directory cleanup
+    :param function tmpdir: pytest fixture for local test directory cleanup
     """
     # setup
     n_points = 128
@@ -72,7 +83,7 @@ def test_process_segy_data_should_write_npy_files_for_n_equals_128_stride_64(tmp
 
     # test
     segyextract.process_segy_data(FILENAME, tmpdir.strpath, PREFIX, n_points=n_points,
-        stride=stride)
+                                  stride=stride)
 
     # validate
     _output_npy_files_are_correct_for_cube_size(4, 128, tmpdir.strpath)
@@ -82,7 +93,7 @@ def test_process_segy_data_should_write_npy_files_for_n_equals_128(tmpdir):
     """
     Break data up into size n=128 size blocks and validate against original segy
     file. This size of block causes the code to write 1 x 4 npy files
-    :param function filedir: pytest fixture for local test directory cleanup
+    :param function tmpdir: pytest fixture for local test directory cleanup
     """
     # setup
     n_points = 128
@@ -96,7 +107,6 @@ def test_process_segy_data_should_write_npy_files_for_n_equals_128(tmpdir):
     full_volume_from_file = test_util.build_volume(n_points, npy_files, tmpdir.strpath)
 
     # Validate contents of volume
-    # _compare_output_to_segy(FILENAME, os.path.join(tmpdir.strpath, npy_files[0]), 40, 200, 10)
     _compare_variance(FILENAME, PREFIX, full_volume_from_file, tmpdir.strpath)
 
 
@@ -104,7 +114,7 @@ def test_process_segy_data_should_write_npy_files_for_n_equals_64(tmpdir):
     """
     Break data up into size n=64 size blocks and validate against original segy
     file. This size of block causes the code to write 1 x 8 npy files
-    :param function filedir: pytest fixture for local test directory cleanup
+    :param function tmpdir: pytest fixture for local test directory cleanup
     """
     # setup
 
@@ -119,7 +129,6 @@ def test_process_segy_data_should_write_npy_files_for_n_equals_64(tmpdir):
     full_volume_from_file = test_util.build_volume(n_points, npy_files, tmpdir.strpath)
 
     # Validate contents of volume
-    # _compare_output_to_segy(FILENAME, os.path.join(tmpdir.strpath, npy_files[0]), 40, 200, 10)
     _compare_variance(FILENAME, PREFIX, full_volume_from_file, tmpdir.strpath)
 
 
@@ -127,14 +136,14 @@ def test_process_segy_data_should_write_npy_files_for_n_equals_16(tmpdir):
     """
     Break data up into size n=16 size blocks and validate against original segy
     file. This size of block causes the code to write 2 x 4 x 32 npy files.
-    :param function filedir: pytest fixture for local test directory cleanup
+    :param function tmpdir: pytest fixture for local test directory cleanup
     """
     # setup
     n_points = 16
 
     # test
     segyextract.process_segy_data(FILENAME, tmpdir.strpath, PREFIX,
-        n_points=n_points, stride=n_points)
+                                  n_points=n_points, stride=n_points)
 
     # validate
     npy_files = _output_npy_files_are_correct_for_cube_size(39, 16, tmpdir.strpath)
@@ -146,12 +155,8 @@ def test_process_segy_data_should_write_npy_files_for_n_equals_16(tmpdir):
 def test_process_npy_file_should_have_same_content_as_segy(tmpdir):
     """
     Check the actual content of a npy file generated from the segy
+    :param function tmpdir: pytest fixture for local test directory cleanup
     """
-
-    inline_size = 40
-    xline_size = 200
-    depth = 10
-
     segyextract.process_segy_data_into_single_array(FILENAME, tmpdir.strpath, PREFIX)
 
     npy_files = test_util.get_npy_files(tmpdir.strpath)
@@ -159,6 +164,7 @@ def test_process_npy_file_should_have_same_content_as_segy(tmpdir):
 
     data = np.load(os.path.join(tmpdir.strpath, npy_files[0]))
     _compare_output_to_segy(FILENAME, data, 40, 200, 10)
+
 
 def _output_npy_files_are_correct_for_cube_size(expected_count, cube_size, outputdir):
     """
@@ -178,33 +184,6 @@ def _output_npy_files_are_correct_for_cube_size(expected_count, cube_size, outpu
 
     return npy_files
 
-
-# def _compare_output_to_segy(filename, npy_file, fast_size, slow_size, depth):
-#     """
-#     Compares each trace in the segy file to the data volume in the npy file
-
-#     :param str filename: path to segy file
-#     :param nparray data: data read in from npy files
-#     """
-#     with segyio.open(filename, ignore_geometry=True) as segy_file:
-#         segy_file.mmap()
-#         segy_sum = np.float32(0.0)
-#         npy_sum = np.float32(0.0)
-#         data = np.load(npy_file)
-#         anchor_data = os.path.split(npy_file)[1].split('.')[0].split('_')
-#         fast_start = int(anchor_data[1])
-#         slow_start = int(anchor_data[2])
-#         depth_start = int(anchor_data[3])
-#         # Validate that each trace in the segy file is represented in the npy files
-#         # Sum traces in segy and npy to ensure they are correct
-#         for i in range(fast_start, fast_start + data.shape[0]):  # Fast
-#             for j in range(slow_start, slow_start + data.shape[1]):  # Slow
-#                 trace = segy_file.trace[j + (i * slow_size)]
-#                 data_trace = data[i, j, 0:depth]
-#                 assert(all([a == b for a, b in zip(trace, data_trace)]))
-#                 segy_sum += np.sum(trace, dtype=np.float32)
-#                 npy_sum += np.sum(data_trace, dtype=np.float32)
-#         assert(segy_sum == npy_sum)
 
 def _compare_output_to_segy(filename, data, fast_size, slow_size, depth):
     """

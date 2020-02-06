@@ -2,18 +2,16 @@
 Test that the current scripts can run from the command line
 """
 import os
-import shutil
-import pytest
 import numpy as np
 import convert_segy
 import test_util
-from argparse import Namespace
 
 
 MAX_RANGE = 1
 MIN_RANGE = 0
 ERROR_EXIT_CODE = 99
 TESTFILE = "./contrib/segyconverter/test/test_data/volume1-label.segy"
+
 
 def test_convert_segy_generates_single_npy(tmpdir):
     # Setup
@@ -27,11 +25,10 @@ def test_convert_segy_generates_single_npy(tmpdir):
     stride = 128
     normalize = True
     inputpath = ""
-    output = ""
 
     # Test
     convert_segy.main(input_file, output_dir, prefix, iline, xline,
-        metadata_only, stride, cube_size, normalize, inputpath)
+                      metadata_only, stride, cube_size, normalize, inputpath)
 
     # Validate
     npy_files = test_util.get_npy_files(tmpdir.strpath)
@@ -59,15 +56,15 @@ def test_convert_segy_generates_multiple_npy_files(tmpdir):
     stride = 128
     normalize = True
     inputpath = ""
-    output = ""
     
     # Test
     convert_segy.main(input_file, output_dir, prefix, iline, xline,
-        metadata_only, stride, cube_size, normalize, inputpath)
+                      metadata_only, stride, cube_size, normalize, inputpath)
 
     # Validate
     npy_files = test_util.get_npy_files(tmpdir.strpath)
     assert(len(npy_files) == 2)
+
 
 def test_convert_segy_normalizes_data(tmpdir):
     """
@@ -86,11 +83,10 @@ def test_convert_segy_normalizes_data(tmpdir):
     stride = 128
     normalize = True
     inputpath = ""
-    output = ""
     
     # Test
     convert_segy.main(input_file, output_dir, prefix, iline, xline,
-        metadata_only, stride, cube_size, normalize, inputpath)
+                      metadata_only, stride, cube_size, normalize, inputpath)
 
     # Validate
     npy_files = test_util.get_npy_files(tmpdir.strpath)
