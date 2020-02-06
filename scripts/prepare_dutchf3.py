@@ -13,7 +13,7 @@ from os import path, mkdir
 
 import fire
 import numpy as np
-# from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split
 
 
 def _write_split_files(splits_path, train_list, test_list, loader_type):
@@ -99,8 +99,8 @@ def split_patch_train_val(data_dir, output_dir, label_file, stride, patch, slice
     """Generate train and validation files for Netherlands F3 dataset.
 
     Args:
-        output_dir (str): directory under input_dir to store the split files
-        label_file (str): npy files with labels. Stored in input_dir
+        output_dir (str): directory under data_dir to store the split files
+        label_file (str): npy files with labels. Stored in data_dir
         stride (int): stride to use when sectioning of the volume
         patch (int): size of patch to extract
         per_val (float, optional):  the fraction of the volume to use for validation.
@@ -285,7 +285,7 @@ def split_alaudah_et_al_19(data_dir, output_dir, labels_file, stride, fraction_v
 
 # TODO: Try https://github.com/Chilipp/docrep for doscstring reuse
 class SplitTrainValCLI(object):
-    def section(self, data_dir, per_val=0.2, log_config="logging.conf", output_dir=None, slice_steps=1):
+    def section(self, data_dir, label_file, per_val=0.2, log_config="logging.conf", output_dir=None, slice_steps=1):
         """Generate section based train and validation files for Netherlands F3 dataset.
 
         Args:
@@ -294,17 +294,17 @@ class SplitTrainValCLI(object):
                 Defaults to 0.2.
             log_config (str): path to log configurations
         """
-        return split_section_train_val(data_dir, output_dir, slice_steps, per_val=per_val, log_config=log_config)
+        return split_section_train_val(data_dir, output_dir, label_file, slice_steps, per_val, log_config)
 
     def patch(self, label_file, stride, patch,
                 per_val=0.2, log_config="train/deepseismic/configs/logging.conf",
-                input=None, output_dir=None, slice_steps=1):
+                data_dir=None, output_dir=None, slice_steps=1):
         """Generate patch based train and validation files for Netherlands F3 dataset.
 
         Args:
-            input (str): data directory path
-            output_dir (str): directory under input to store the split files
-            label_file (str): npy files with labels. Stored in input_dir
+            data_dir (str): data directory path
+            output_dir (str): directory under data_dir to store the split files
+            label_file (str): npy files with labels. Stored in data_dir
             stride (int): stride to use when sectioning of the volume
             patch (int): size of patch to extract
             per_val (float, optional):  the fraction of the volume to use for validation.
@@ -312,20 +312,20 @@ class SplitTrainValCLI(object):
             log_config (str): path to log configurations
             slice_steps (int): number of slices to be skipped. Defaults to 1.
         """
-        if input is not None:
-            label_file = os.path.join(input, label_file)
-        output_dir = os.path.join(input, output_dir)
-        return split_patch_train_val(output_dir=output_dir, label_file=label_file,
-                        stride=stride, patch=patch,
-                        per_val=per_val, log_config=log_config,
-                        slice_steps=slice_steps)
+        if data_dir is not None:
+            label_file = path.join(data_dir, label_file)
+        output_dir = path.join(data_dir, output_dir)
+        return split_patch_train_val(output_dir, label_file,
+                                        stride, patch,
+                                        per_val, log_config,
+                                        slice_steps)
 
 if __name__ == "__main__":
     """Example:
     python prepare_data.py split_train_val section --data-dir=/mnt/dutch
     or
     python prepare_dutchf3.py split_train_val patch --output_dir=splits \
-                    --input=data/ --slice_steps=2 --stride=50 --patch=100 \
+                    --data_dir=data/ --slice_steps=2 --stride=50 --patch=100 \
                     --label_file=label_file.npy
 
     """
