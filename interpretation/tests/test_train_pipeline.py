@@ -2,7 +2,7 @@
 Integration tests for the train pipeline
 """
 import pytest
-from src.azml.train_pipeline.train_pipeline import TrainPipeline
+from deepseismic_interpretation.azureml_pipelines.train_pipeline import TrainPipeline
 import json
 
 test_data = None

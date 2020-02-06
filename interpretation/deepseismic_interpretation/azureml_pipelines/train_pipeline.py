@@ -2,7 +2,7 @@
 TrainPipeline class for setting up a training pipeline in AzureML.
 Inherits from DeepSeismicAzMLPipeline
 """
-from src.azml.base_pipeline import DeepSeismicAzMLPipeline
+from deepseismic_interpretation.azureml_pipelines.base_pipeline import DeepSeismicAzMLPipeline
 
 
 class TrainPipeline(DeepSeismicAzMLPipeline):
