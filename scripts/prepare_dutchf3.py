@@ -16,12 +16,12 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 
 
-def _get_splits_path(data_dir):
-    return path.join(data_dir, "splits")
+# def _get_splits_path(data_dir):
+#     return path.join(data_dir, "splits")
 
 
-def _get_labels_path(data_dir):
-    return path.join(data_dir, "train", "train_labels.npy")
+# def _get_labels_path(data_dir):
+#     return path.join(data_dir, "train", "train_labels.npy")
 
 
 def _write_split_files(splits_path, train_list, test_list, loader_type):
@@ -50,7 +50,7 @@ def _get_aline_range(aline, per_val, slice_steps):
         raise
 
 
-def split_section_train_val(data_dir, per_val=0.2, log_config=None, slice_steps=1):
+def split_section_train_val(data_dir, output_dir, label_file, per_val=0.2, log_config=None, slice_steps=1):
     """Generate train and validation files for Netherlands F3 dataset.
 
     Args:
@@ -67,9 +67,9 @@ def split_section_train_val(data_dir, per_val=0.2, log_config=None, slice_steps=
     logger.info("Splitting data into sections .... ")
     logger.info(f"Reading data from {data_dir}")
 
-    labels_path = _get_labels_path(data_dir)
-    logger.info(f"Loading {labels_path}")
-    labels = np.load(labels_path)
+    # labels_path = _get_labels_path(data_dir)
+    logger.info(f"Loading {label_file}")
+    labels = np.load(label_file)
     logger.debug(f"Data shape [iline|xline|depth] {labels.shape}")
 
     iline, xline, _ = labels.shape
@@ -93,8 +93,12 @@ def split_section_train_val(data_dir, per_val=0.2, log_config=None, slice_steps=
     test_list = test_x_list + test_i_list
 
     # write to files to disk
-    splits_path = _get_splits_path(data_dir)
-    _write_split_files(splits_path, train_list, test_list, "section")
+    # splits_path = _get_splits_path(data_dir)
+    # _write_split_files(splits_path, train_list, test_list, "section")
+    logger.info(f"Writing {output_dir}")
+    _write_split_files(output_dir, train_list, test_list, "section")
+
+    
 
 
 def split_patch_train_val(data_dir, output_dir, label_file, stride, patch, slice_steps=1, per_val=0.2, log_config=None):
@@ -119,9 +123,9 @@ def split_patch_train_val(data_dir, output_dir, label_file, stride, patch, slice
     logger.info("Splitting data into patches .... ")
     logger.info(f"Reading data from {data_dir}")
 
-    labels_path = _get_labels_path(data_dir)
-    logger.info(f"Loading {labels_path}")
-    labels = np.load(labels_path)
+    # labels_path = _get_labels_path(data_dir)
+    logger.info(f"Loading {label_file}")
+    labels = np.load(label_file)
     logger.debug(f"Data shape [iline|xline|depth] {labels.shape}")
 
     iline, xline, depth = labels.shape
@@ -180,8 +184,10 @@ def split_patch_train_val(data_dir, output_dir, label_file, stride, patch, slice
 
     # write to files to disk:
     # NOTE: This isn't quite right we should calculate the patches again for the whole volume
-    splits_path = _get_splits_path(data_dir)
-    _write_split_files(splits_path, train_list, test_list, "patch")
+    # splits_path = _get_splits_path(data_dir)
+    # _write_split_files(splits_path, train_list, test_list, "patch")
+    logger.info(f"Writing {output_dir}")
+    _write_split_files(output_dir, train_list, test_list, "patch")
 
 
 _LOADER_TYPES = {"section": split_section_train_val, "patch": split_patch_train_val}
@@ -196,7 +202,7 @@ def run_split_func(loader_type, *args, **kwargs):
     split_func(*args, **kwargs)
 
 
-def split_alaudah_et_al_19(data_dir, stride, fraction_validation=0.2, loader_type="patch", log_config=None):
+def split_alaudah_et_al_19(data_dir, output_dir, labels_file, stride, fraction_validation=0.2, loader_type="patch", log_config=None):
     """Generate train and validation files (with overlap) for Netherlands F3 dataset.
     The original split method from https://github.com/olivesgatech/facies_classification_benchmark
     DON'T USE, SEE NOTES BELOW
@@ -231,9 +237,9 @@ def split_alaudah_et_al_19(data_dir, stride, fraction_validation=0.2, loader_typ
 
     logger.info("Reading data from {data_dir}")
 
-    labels_path = _get_labels_path(data_dir)
-    logger.info("Loading {labels_path}")
-    labels = np.load(labels_path)
+    # labels_path = _get_labels_path(data_dir)
+    logger.info("Loading {labels_file}")
+    labels = np.load(labels_file)
     iline, xline, depth = labels.shape
     logger.debug(f"Data shape [iline|xline|depth] {labels.shape}")
 
@@ -276,13 +282,16 @@ def split_alaudah_et_al_19(data_dir, stride, fraction_validation=0.2, loader_typ
     train_list, test_list = train_test_split(list_train_val, test_size=fraction_validation, shuffle=True)
 
     # write to files to disk:
-    splits_path = _get_splits_path(data_dir)
-    _write_split_files(splits_path, train_list, test_list, loader_type)
+    # splits_path = _get_splits_path(data_dir)
+    # _write_split_files(splits_path, train_list, test_list, loader_type)
+    logger.info(f"Writing {output_dir}")
+    _write_split_files(output_dir, train_list, test_list, loader_type)
+
 
 
 # TODO: Try https://github.com/Chilipp/docrep for doscstring reuse
 class SplitTrainValCLI(object):
-    def section(self, data_dir, per_val=0.2, log_config="logging.conf"):
+    def section(self, data_dir, per_val=0.2, log_config="logging.conf", output_dir=None, slice_steps=1):
         """Generate section based train and validation files for Netherlands F3 dataset.
 
         Args:
@@ -291,7 +300,7 @@ class SplitTrainValCLI(object):
                 Defaults to 0.2.
             log_config (str): path to log configurations
         """
-        return split_section_train_val(data_dir, per_val=per_val, log_config=log_config)
+        return split_section_train_val(data_dir, output_dir, slice_steps, per_val=per_val, log_config=log_config)
 
     def patch(self, label_file, stride, patch,
                 per_val=0.2, log_config="train/deepseismic/configs/logging.conf",

@@ -125,7 +125,7 @@ def test_prepare_dutchf3():
     with tempfile.TemporaryDirectory() as tmpdirname:
 
         # saving the file to be used by the script
-        label_file = tmpdirname + '/train/train_labels.npy'
+        label_file = tmpdirname + '/label_file.npy'
         np.save(label_file, ALINE)
 
         # stting the output directory to be used by the script
@@ -167,7 +167,7 @@ def test_prepare_dutchf3_single_step():
     with tempfile.TemporaryDirectory() as tmpdirname:
 
         # saving the file to be used by the script
-        label_file = tmpdirname + '/train/train_labels.npy'
+        label_file = tmpdirname + '/label_file.npy'
         np.save(label_file, ALINE)
 
         # stting the output directory to be used by the script
@@ -175,8 +175,9 @@ def test_prepare_dutchf3_single_step():
 
         # calling the main function of the script without SLICE_STEPS, to check default value
         prep_dutchf3.split_patch_train_val(data_dir=tmpdirname, output_dir=output, label_file=label_file,
-                                           stride=STRIDE, patch=PATCH,
-                                           per_val=PER_VAL, log_config=LOG_CONFIG)
+                                           slice_steps=SLICE_STEPS, stride=STRIDE,
+                                           patch=PATCH, per_val=PER_VAL,
+                                           log_config=LOG_CONFIG)
 
         # reading the file and splitting the data
         patch_train = pd.read_csv(output + '/patch_train.txt', header=None, names=['row', 'a', 'b'])
