@@ -1,7 +1,7 @@
 # pylint: disable=import-error
 
 """
-Test data normalization in listric2 data
+Test data normalization
 """
 import os
 import numpy as np
