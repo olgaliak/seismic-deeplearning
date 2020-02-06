@@ -9,22 +9,16 @@ import logging
 import logging.config
 import math
 import warnings
-from os import path
+from os import path, mkdir
 
 import fire
 import numpy as np
-from sklearn.model_selection import train_test_split
-
-
-# def _get_splits_path(data_dir):
-#     return path.join(data_dir, "splits")
-
-
-# def _get_labels_path(data_dir):
-#     return path.join(data_dir, "train", "train_labels.npy")
+# from sklearn.model_selection import train_test_split
 
 
 def _write_split_files(splits_path, train_list, test_list, loader_type):
+    if not path.isdir(splits_path):
+        mkdir(splits_path)
     file_object = open(path.join(splits_path, loader_type + "_train_val.txt"), "w")
     file_object.write("\n".join(train_list + test_list))
     file_object.close()
@@ -319,13 +313,12 @@ class SplitTrainValCLI(object):
             slice_steps (int): number of slices to be skipped. Defaults to 1.
         """
         if input is not None:
-            label_file = path.join(input, label_file)
-        output_dir = path.join(input, output_dir)
-        return split_patch_train_val(data_dir=input, output_dir=output_dir, label_file=label_file,
+            label_file = os.path.join(input, label_file)
+        output_dir = os.path.join(input, output_dir)
+        return split_patch_train_val(output_dir=output_dir, label_file=label_file,
                         stride=stride, patch=patch,
                         per_val=per_val, log_config=log_config,
                         slice_steps=slice_steps)
-
 
 if __name__ == "__main__":
     """Example:
