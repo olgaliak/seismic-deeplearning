@@ -136,7 +136,7 @@ def process_segy_data(input_file, output_dir, prefix,
 
         stddev = np.sqrt(variance)
         with open(os.path.join(output_dir, prefix + '.json'), 'w') as f:
-            f.write(json.dumps({ 'stddev': stddev, 'mean': mean}))
+            f.write(json.dumps({'stddev': stddev, 'mean': mean}))
         print("Npy files written: {}".format(filecount))
 
 

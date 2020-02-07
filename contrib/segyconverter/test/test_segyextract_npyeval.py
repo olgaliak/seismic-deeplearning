@@ -232,4 +232,4 @@ def _compare_variance(filename, prefix, data, outputdir):
     metadata = json.loads(metadatastr)
     stddev = float(metadata['stddev'])
 
-    assert(round(float(metadata['stddev'])) == round(segy_stddev))
+    assert(round(stddev) == round(segy_stddev))
