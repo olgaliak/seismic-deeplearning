@@ -79,21 +79,6 @@ class TestTrainPipelineIntegration:
         with pytest.raises(KeyError):
             orchestrator.construct_pipeline()
 
-    # def test_no_env_variables_throws_error(self):
-    #     pass
-
-    # def test_no_comp_target_creates_one(self):
-    #     pass
-
-    # def test_no_datastore_creates_one(self):
-    #     pass
-
-    # def test_non_existent_blob_throws_error(self):
-    #     assert True == False
-
-    # def test_non_tags_handles_correctly(self):
-    #     pass
-
     def _create_config_without(self, step, dependency_to_omit):
         """
         helper function that removes dependencies from config file
