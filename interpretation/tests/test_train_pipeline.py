@@ -4,7 +4,9 @@ Integration tests for the train pipeline
 import pytest
 from deepseismic_interpretation.azureml_pipelines.train_pipeline import TrainPipeline
 import json
+import os
 
+TEMP_CONFIG_FILE = "test_batch_config.json"
 test_data = None
 
 
@@ -36,11 +38,12 @@ class TestTrainPipelineIntegration:
         yield
         if hasattr(self, 'run'):
             self.run.cancel()
+        os.remove(TEMP_CONFIG_FILE)
 
     def test_train_pipeline_expected_inputs_submits_correctly(self):
         # arrange
         self._setup_test_config()
-        orchestrator = TrainPipeline("train/pipeline_config.json")
+        orchestrator = TrainPipeline("interpretation/tests/example_config.json")
         # act
         orchestrator.construct_pipeline()
         self.run = orchestrator.run_pipeline(experiment_name="TEST-train-pipeline")
@@ -105,6 +108,6 @@ class TestTrainPipelineIntegration:
         helper function that saves the test data in a temp config file
         """
         self.data = test_data
-        self.test_config = "dev/test_batch_config.json"
+        self.test_config = TEMP_CONFIG_FILE
         with open(self.test_config, 'w') as data_file:
             json.dump(self.data, data_file)
