@@ -7,6 +7,7 @@ import numpy as np
 import utils.segyextract as segyextract
 import test_util
 import segyio
+import json
 
 FILENAME = "./contrib/segyconverter/test/test_data/normalsegy.segy"
 PREFIX = "normal"
@@ -224,7 +225,11 @@ def _compare_variance(filename, prefix, data, outputdir):
         segy_file.mmap()
         segy_stddev = np.sqrt(np.var(data))
 
-        # Check statistics file generated from segy
-        with open(os.path.join(outputdir, prefix + '.txt'), 'r') as f:
-            stddev = f.readline()
-        assert(round(float(stddev)) == round(segy_stddev))
+    # Check statistics file generated from segy
+    with open(os.path.join(outputdir, prefix + '.json'), 'r') as f:
+        metadatastr = f.read()
+    
+    metadata = json.loads(metadatastr)
+    stddev = float(metadata['stddev'])
+
+    assert(round(float(metadata['stddev'])) == round(segy_stddev))

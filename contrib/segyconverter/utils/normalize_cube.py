@@ -8,7 +8,7 @@ import numpy as np
 import argparse
 
 
-def compute_statistics(stddev: float, max_range: float, k: int):
+def compute_statistics(stddev: float, mean: float, max_range: float, k: int):
     """
         Compute min_clip, max_clip and scale values based on provided stddev, max_range and k values
         :param stddev: standard deviation value
@@ -17,8 +17,8 @@ def compute_statistics(stddev: float, max_range: float, k: int):
         :returns: min_clip, max_clip, scale: computed values
         :rtype: float, float, float
     """
-    min_clip = -k * stddev
-    max_clip = k * stddev
+    min_clip = mean - k * stddev
+    max_clip = mean + k * stddev
     scale = max_range / (max_clip - min_clip)
     return min_clip, max_clip, scale
 
@@ -36,7 +36,9 @@ def norm_value(v: float, min_clip: float, max_clip: float, min_range: float, max
         :returns: normalized value, must be within [min_range, max_range]
         :rtype: float
     """
-    offset = -1 * min_clip
+    offset = 0
+    if scale != 1:
+        offset = -1 * min_clip  # Normalizing - set values between 0 and 1
     # Clip value
     if v > max_clip:
         v = max_clip
@@ -45,13 +47,13 @@ def norm_value(v: float, min_clip: float, max_clip: float, min_range: float, max
     # Scale value
     v = (v + offset) * scale
     # This value should ALWAYS be between min_range and max_range here
-    if v > max_range or v < min_range:
+    if scale != 1 and (v > max_range or v < min_range):
         raise Exception('normalized value should be within [{0},{1}].\
              The value was: {2}'.format(min_range, max_range, v))
     return v
 
 
-def normalize_file(local_filename, stddev, k, min_range_value, max_range_value):
+def clip_file(local_filename, stddev, mean, k, min_range_value, max_range_value, normalize=True):
     """
         Normalize npy array file according to statistics. This function overwrites the existing
         data file
@@ -65,8 +67,8 @@ def normalize_file(local_filename, stddev, k, min_range_value, max_range_value):
     cube = np.load(local_filename)
     # Normalize block
     try:
-        norm_cube = main(cube=cube, stddev=stddev, k=k, min_range=min_range_value,
-                                    max_range=max_range_value)
+        norm_cube = main(cube=cube, stddev=stddev, mean=mean, k=k, min_range=min_range_value,
+                         max_range=max_range_value, normalize=normalize)
     except Exception as ex:
         print("ERROR: Not possible to normalize cube. {}".format(ex))
     # Save normalized cube locally
@@ -90,11 +92,11 @@ def normalize_cube(cube: np.array, min_clip: float, max_clip: float, scale: floa
     vfunc = np.vectorize(norm_value)
     # Normalize cube
     norm_cube = vfunc(cube, min_clip=min_clip, max_clip=max_clip, min_range=min_range, max_range=max_range,
-                       scale=scale)
+                      scale=scale)
     return norm_cube
 
 
-def main(cube: np.array, stddev: float, k: float, min_range: float, max_range: float):
+def main(cube: np.array, stddev: float, mean: float, k: float, min_range: float, max_range: float, normalize=True):
     """
     Compute statistics and normalize cube
     :param cube: 3D array to be normalized
@@ -113,7 +115,9 @@ def main(cube: np.array, stddev: float, k: float, min_range: float, max_range: f
         raise Exception("k must not be zero")
 
     # Compute statistics
-    min_clip, max_clip, scale = compute_statistics(stddev=stddev, k=k, max_range=max_range)
+    min_clip, max_clip, scale = compute_statistics(stddev=stddev, mean=mean, k=k, max_range=max_range)
+    if not normalize:
+        scale = 1
     # Normalize cube
     norm_cube = normalize_cube(cube=cube, min_clip=min_clip, max_clip=max_clip, scale=scale, min_range=min_range,
                                max_range=max_range)

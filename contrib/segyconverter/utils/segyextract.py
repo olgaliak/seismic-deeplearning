@@ -8,6 +8,7 @@ import math
 import segyio
 import pandas as pd
 import numpy as np
+import json
 
 FAST = 'fast'
 SLOW = 'slow'
@@ -85,8 +86,10 @@ def process_segy_data_into_single_array(input_file, output_dir, prefix, iline=18
                              slow_distinct[0], 0)), block)
         variance = np.var(block)
         stddev = np.sqrt(variance)
-        with open(os.path.join(output_dir, prefix + '.txt'), 'w') as f:
-            f.write(str(stddev))
+        mean = np.mean(block)
+
+        with open(os.path.join(output_dir, prefix + '.json'), 'w') as f:
+            f.write(json.dumps({'stddev': str(stddev), 'mean': str(mean)}))
         print("Npy files written: 1")
     return block
 
@@ -108,7 +111,7 @@ def process_segy_data(input_file, output_dir, prefix,
         segy_file.mmap()
         # Global variance of segy data
         variance = 0
-        average = 0
+        mean = 0
         sample_count = 0
         filecount = 0
         block_size = n_points**3
@@ -118,22 +121,22 @@ def process_segy_data(input_file, output_dir, prefix,
             if (variance == 0):
                 # init
                 variance = np.var(block)
-                average = np.average(block)
+                mean = np.mean(block)
                 sample_count = block_size
             else:
-                new_avg = np.average(block)
+                new_avg = np.mean(block)
                 new_variance = np.var(block)
-                variance = _parallel_variance(average, sample_count, variance,
+                variance = _parallel_variance(mean, sample_count, variance,
                                               new_avg, block_size, new_variance)
-                average = ((average * sample_count) + np.sum(block)) / (sample_count + block_size)
+                mean = ((mean * sample_count) + np.sum(block)) / (sample_count + block_size)
                 sample_count += block_size
 
             np.save(os.path.join(output_dir, "{}_{}_{}_{:05d}".format(prefix, i, j, k)), block)
             filecount += 1
 
         stddev = np.sqrt(variance)
-        with open(os.path.join(output_dir, prefix + '.txt'), 'w') as f:
-            f.write(str(stddev))
+        with open(os.path.join(output_dir, prefix + '.json'), 'w') as f:
+            f.write(json.dumps({ 'stddev': stddev, 'mean': mean}))
         print("Npy files written: {}".format(filecount))
 
 

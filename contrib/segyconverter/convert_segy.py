@@ -8,9 +8,10 @@ import argparse
 import numpy as np
 import utils.segyextract as segyextract
 import utils.normalize_cube as normalize_cube
+import json
 
 
-def _normalize(output_dir, stddev_file, k, min_range, max_range):
+def _clip(output_dir, stddev_file, k, min_range, max_range, normalize):
     """
     Normalization step on all files in output_dir
     :param str output_dir: Directory path of all npy files to normalize
@@ -23,21 +24,22 @@ def _normalize(output_dir, stddev_file, k, min_range, max_range):
     if not os.path.isfile(txt_file):
         raise Exception("Std Deviation file could not be found")
     with open(os.path.join(output_dir, txt_file), 'r') as f:
-        stddevstr = f.read()
-
-    # Check if it is valid value
+        metadatastr = f.read()
+        
     try:
-        stddev = float(stddevstr)
+        metadata = json.loads(metadatastr)
+        stddev = float(metadata['stddev'])
+        mean = float(metadata['mean'])
     except ValueError:
-        raise Exception('stddev value not valid: {}'.format(stddev))
+        raise Exception('stddev value not valid: {}'.format(metadatastr))
 
     npy_files = list(f for f in os.listdir(output_dir) if f.endswith('.npy'))
     for local_filename in npy_files:
-        normalize_cube.normalize_file(os.path.join(output_dir, local_filename), stddev,
-                                      k, min_range, max_range)
+        normalize_cube.clip_file(os.path.join(output_dir, local_filename), stddev, mean,
+                                 k, min_range, max_range, normalize=normalize)
 
 
-def main(input_file, output_dir, prefix, iline=189, xline=193, metadata_only=False, stride=128, cube_size=-1, normalize=True, input=None):
+def main(input_file, output_dir, prefix, iline=189, xline=193, metadata_only=False, stride=128, cube_size=-1, normalize=True, clip=True, input=None):
     """
     Select a single column out of the segy file and generate all cubes in the z(time)
     direction. The column is indexed by the inline and xline. To use this command, you
@@ -91,8 +93,14 @@ def main(input_file, output_dir, prefix, iline=189, xline=193, metadata_only=Fal
         # At this point, there should be npy files in the output directory + one file containing the std deviation found in the segy
         if normalize:
             print("Normalizing and Clipping File")
-            wrapped_normalizer = segyextract.timewrapper(_normalize, output_dir, f"{prefix}.txt", 12, 0, 1)
-            process_time_normalize = timeit.timeit(wrapped_normalizer, number=1)
+            wrapped_clip = segyextract.timewrapper(_clip, output_dir, f"{prefix}.json", 12, 0, 1, normalize)
+            process_time_normalize = timeit.timeit(wrapped_clip, number=1)
+            print(f"Completed normalization and clipping in {process_time_normalize} seconds")
+        elif clip:
+            normalize = False
+            print("Clipping File")
+            wrapped_clip = segyextract.timewrapper(_clip, output_dir, f"{prefix}.json", 12, 0, 1, normalize)
+            process_time_normalize = timeit.timeit(wrapped_clip, number=1)
             print(f"Completed normalization and clipping in {process_time_normalize} seconds")
 
 
@@ -114,7 +122,8 @@ if __name__ == '__main__':
                         help="cube dimensions")
     parser.add_argument("--stride", type=int, default=128,
                         help="stride")
-    parser.add_argument("--normalize", action='store_true', help="Normalization flag")
+    parser.add_argument("--normalize", action='store_true', help="Normalization flag -  clip and normalize the data")
+    parser.add_argument("--clip", action='store_true', help="Clipping flag -  only clip the data")
     parser.add_argument("--input", type=str, default="", help="Used when running in Azure ML Service - Path to input data")
     parser.add_argument("--output", type=str, default="", help="Used when running in Azure ML Service - Currently ignored")
 
@@ -122,4 +131,4 @@ if __name__ == '__main__':
     localfile = args.input_file
 
     main(args.input_file, args.output_dir, args.prefix, args.iline, args.xline,
-         args.metadata_only, args.stride, args.cube_size, args.normalize, args.input)
+         args.metadata_only, args.stride, args.cube_size, args.normalize, args.clip, args.input)
