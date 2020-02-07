@@ -77,7 +77,7 @@ def prepare_batch(batch, device=None, non_blocking=False):
     )
 
 
-def run(*options, cfg=None, debug=False, input=None):
+def run(*options, cfg=None, debug=False, input=None, output=None):
     """Run training and validation of model
 
     Notes:
@@ -92,6 +92,7 @@ def run(*options, cfg=None, debug=False, input=None):
         cfg (str, optional): Location of config file to load. Defaults to None.
         debug (bool): Places scripts in debug/test mode and only executes a few iterations
         input (str, optional): Location of data if Azure ML run
+        output (str, optional): Location for output if Azure ML run
     """
 
     update_config(config, options=options, config_file=cfg)
@@ -100,9 +101,12 @@ def run(*options, cfg=None, debug=False, input=None):
     config_file_name = "default_config" if not cfg else cfg.split("/")[-1].split(".")[0]
 
     data_dir = config.DATASET.ROOT
+    output_dir = config.OUTPUT_DIR
 
     if input is not None:
         data_dir = input
+    if output is not None:
+        output_dir = output
 
     # Start logging
     load_log_configuration(config.LOG_CONFIG)
@@ -187,9 +191,9 @@ def run(*options, cfg=None, debug=False, input=None):
     )
 
     try:
-        output_dir = generate_path(config.OUTPUT_DIR, git_branch(), git_hash(), config_file_name, config.TRAIN.MODEL_DIR, current_datetime(),)
+        output_dir = generate_path(output_dir, git_branch(), git_hash(), config_file_name, config.TRAIN.MODEL_DIR, current_datetime(),)
     except (TypeError, InvalidGitRepositoryError):
-        output_dir = generate_path(config.OUTPUT_DIR, config_file_name, config.TRAIN.MODEL_DIR, current_datetime(),)
+        output_dir = generate_path(output_dir, config_file_name, config.TRAIN.MODEL_DIR, current_datetime(),)
 
     summary_writer = create_summary_writer(log_dir=path.join(output_dir, config.LOG_DIR))
 
