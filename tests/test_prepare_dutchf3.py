@@ -121,7 +121,7 @@ def test_prepare_dutchf3_patch_step_1():
 
         # calling the main function of the script without SLICE_STEPS, to check default value
         prep_dutchf3.split_patch_train_val(data_dir=tmpdirname, output_dir=output, label_file=label_file, 
-        slice_steps=SLICE_STEPS, stride=STRIDE, patch=PATCH, per_val=PER_VAL,log_config=LOG_CONFIG)
+        slice_steps=SLICE_STEPS, stride=STRIDE, patch_size=PATCH, per_val=PER_VAL,log_config=LOG_CONFIG)
 
         # reading the file and splitting the data
         patch_train = pd.read_csv(output + '/patch_train.txt', header=None, names=['row', 'a', 'b'])
@@ -158,7 +158,7 @@ def test_prepare_dutchf3_patch_step_2():
 
         # calling the main function of the script without SLICE_STEPS, to check default value
         prep_dutchf3.split_patch_train_val(data_dir=tmpdirname, output_dir=output, label_file=label_file, 
-        slice_steps=SLICE_STEPS, stride=STRIDE, patch=PATCH, per_val=PER_VAL,log_config=LOG_CONFIG)
+        slice_steps=SLICE_STEPS, stride=STRIDE, patch_size=PATCH, per_val=PER_VAL,log_config=LOG_CONFIG)
 
         # reading the file and splitting the data
         patch_train = pd.read_csv(output + '/patch_train.txt', header=None, names=['row', 'a', 'b'])
