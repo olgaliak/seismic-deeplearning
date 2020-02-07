@@ -8,9 +8,9 @@ import scripts.prepare_dutchf3 as prep_dutchf3
 
 # Setup
 OUTPUT = None
-ILINE = XLINE = DEPTH = 100
+ILINE = XLINE = DEPTH = 111
 ALINE = np.zeros((ILINE, XLINE, DEPTH))
-STRIDE = 50
+STRIDE = 100
 PATCH = 100
 PER_VAL = 0.2
 LOG_CONFIG = None
@@ -107,6 +107,7 @@ def test_prepare_dutchf3_patch_step_1():
     """
     # setting a value to SLICE_STEPS as needed to test the values
     SLICE_STEPS = 1
+    r = 0
 
     # use a temp dir that will be discarded at the end of the execution
     with tempfile.TemporaryDirectory() as tmpdirname:
@@ -119,33 +120,30 @@ def test_prepare_dutchf3_patch_step_1():
         output = tmpdirname + '/split'
 
         # calling the main function of the script without SLICE_STEPS, to check default value
-        prep_dutchf3.split_patch_train_val(data_dir=tmpdirname, output_dir=output, label_file=label_file,
-                                           slice_steps=SLICE_STEPS, stride=STRIDE,
-                                           patch=PATCH, per_val=PER_VAL,
-                                           log_config=LOG_CONFIG)
+        prep_dutchf3.split_patch_train_val(data_dir=tmpdirname, output_dir=output, label_file=label_file, 
+        slice_steps=SLICE_STEPS, stride=STRIDE, patch=PATCH, per_val=PER_VAL,log_config=LOG_CONFIG)
 
         # reading the file and splitting the data
         patch_train = pd.read_csv(output + '/patch_train.txt', header=None, names=['row', 'a', 'b'])
         patch_train = pd.DataFrame(patch_train.row.str.split('_').tolist(), columns=['aline', 'x', 'y', 'z'])
 
         # test
-        i_patch_train = pd.DataFrame([x for x in patch_train.x if (patch_train.aline == 'i').bool])
-        x_patch_train = pd.DataFrame([x for x in patch_train.y if (patch_train.aline == 'x').bool])
+        assert (float(patch_train.y[1]) - float(patch_train.y[0])) % float(SLICE_STEPS) == 0.0
+        assert (float(patch_train.x[len(patch_train.x)-2]) - float(patch_train.x[len(patch_train.x)-1])) % float(SLICE_STEPS) == 0.0
 
-        modules_i = pd.DataFrame([int(x) % SLICE_STEPS for x in i_patch_train])
-        modules_x = pd.DataFrame([int(x) % SLICE_STEPS for x in x_patch_train])
+        # reading the file and splitting the data
+        patch_val = pd.read_csv(output + '/patch_val.txt', header=None, names=['row', 'a', 'b'])
+        patch_val = pd.DataFrame(patch_val.row.str.split('_').tolist(), columns=['aline', 'x', 'y', 'z'])
 
-        zero_i = modules_i.sum(axis=1)
-        zero_x = modules_x.sum(axis=1)
-
-        assert int(zero_i) == 0
-        assert int(zero_x) == 0
-
+        # test
+        assert (float(patch_val.y[1]) - float(patch_val.y[0])) % float(SLICE_STEPS) == 0.0
+        assert (float(patch_val.x[len(patch_val.x)-2]) - float(patch_val.x[len(patch_val.x)-1])) % float(SLICE_STEPS) == 0.0
 
 def test_prepare_dutchf3_patch_step_2():
 
     """check a complete run for the script in case further changes are needed
     """
+    # setting a value to SLICE_STEPS as needed to test the values
     SLICE_STEPS = 2
 
     # use a temp dir that will be discarded at the end of the execution
@@ -158,29 +156,26 @@ def test_prepare_dutchf3_patch_step_2():
         # stting the output directory to be used by the script
         output = tmpdirname + '/split'
 
-        # calling the main function of the script
-        prep_dutchf3.split_patch_train_val(data_dir=tmpdirname, output_dir=output, label_file=label_file,
-                                           slice_steps=SLICE_STEPS, stride=STRIDE,
-                                           patch=PATCH, per_val=PER_VAL,
-                                           log_config=LOG_CONFIG)
+        # calling the main function of the script without SLICE_STEPS, to check default value
+        prep_dutchf3.split_patch_train_val(data_dir=tmpdirname, output_dir=output, label_file=label_file, 
+        slice_steps=SLICE_STEPS, stride=STRIDE, patch=PATCH, per_val=PER_VAL,log_config=LOG_CONFIG)
 
         # reading the file and splitting the data
         patch_train = pd.read_csv(output + '/patch_train.txt', header=None, names=['row', 'a', 'b'])
         patch_train = pd.DataFrame(patch_train.row.str.split('_').tolist(), columns=['aline', 'x', 'y', 'z'])
 
         # test
-        i_patch_train = pd.DataFrame([x for x in patch_train.x if (patch_train.aline == 'i').bool])
-        x_patch_train = pd.DataFrame([x for x in patch_train.y if (patch_train.aline == 'x').bool])
+        # test
+        assert (float(patch_train.y[1]) - float(patch_train.y[0])) % float(SLICE_STEPS) == 0.0
+        assert (float(patch_train.x[len(patch_train.x)-2]) - float(patch_train.x[len(patch_train.x)-1])) % float(SLICE_STEPS) == 0.0
 
-        modules_i = pd.DataFrame([int(x) % SLICE_STEPS for x in i_patch_train])
-        modules_x = pd.DataFrame([int(x) % SLICE_STEPS for x in x_patch_train])
+        # reading the file and splitting the data
+        patch_val = pd.read_csv(output + '/patch_val.txt', header=None, names=['row', 'a', 'b'])
+        patch_val = pd.DataFrame(patch_val.row.str.split('_').tolist(), columns=['aline', 'x', 'y', 'z'])
 
-        zero_i = modules_i.sum(axis=1)
-        zero_x = modules_x.sum(axis=1)
-
-        assert int(zero_i) == 0
-        assert int(zero_x) == 0
-
+        # test
+        assert (float(patch_val.y[1]) - float(patch_val.y[0])) % float(SLICE_STEPS) > 0.0
+        assert (float(patch_val.x[len(patch_val.x)-2]) - float(patch_val.x[len(patch_val.x)-1])) % float(SLICE_STEPS) > 0.0
 
 def test_prepare_dutchf3_section_step_1():
 
@@ -200,28 +195,18 @@ def test_prepare_dutchf3_section_step_1():
         output = tmpdirname + '/split'
 
         # calling the main function of the script without SLICE_STEPS, to check default value
-        prep_dutchf3.split_section_train_val(data_dir=tmpdirname, output_dir=output, label_file=label_file,
-                                                slice_steps=SLICE_STEPS, per_val=PER_VAL, log_config=LOG_CONFIG)
+        prep_dutchf3.split_section_train_val(data_dir=tmpdirname, output_dir=output, label_file=label_file,slice_steps=SLICE_STEPS, per_val=PER_VAL, log_config=LOG_CONFIG)
 
         # reading the file and splitting the data
-        section_train = pd.read_csv(output + '/section_train.txt', header=None, names=['row', 'a'])
+        section_train = pd.read_csv(output + '/section_train.txt', header=None, names=['row'])
         section_train = pd.DataFrame(section_train.row.str.split('_').tolist(), columns=['aline', 'section'])
 
-        print(section_train)
+        section_val = pd.read_csv(output + '/section_val.txt', header=None, names=['row'])
+        section_val = pd.DataFrame(section_val.row.str.split('_').tolist(), columns=['aline', 'section'])
 
         # test
-        i_section_train = pd.DataFrame([x for x in section_train.section if (section_train.aline == 'i').bool])
-        x_section_train = pd.DataFrame([x for x in section_train.section if (section_train.aline == 'x').bool])
-
-        modules_i = pd.DataFrame([int(x) % SLICE_STEPS for x in i_section_train])
-        modules_x = pd.DataFrame([int(x) % SLICE_STEPS for x in x_section_train])
-
-        zero_i = modules_i.sum(axis=1)
-        zero_x = modules_x.sum(axis=1)
-
-        assert int(zero_i) == 0
-        assert int(zero_x) == 0
-
+        assert (float(section_train.section[1]) - float(section_train.section[0])) % float(SLICE_STEPS) == 0.0
+        assert (float(section_val.section[1]) - float(section_val.section[0])) % float(SLICE_STEPS) == 0.0
 
 def test_prepare_dutchf3_section_step_2():
 
@@ -245,20 +230,12 @@ def test_prepare_dutchf3_section_step_2():
                                                 slice_steps=SLICE_STEPS, per_val=PER_VAL, log_config=LOG_CONFIG)
 
         # reading the file and splitting the data
-        section_train = pd.read_csv(output + '/section_train.txt', header=None, names=['row', 'a'])
+        section_train = pd.read_csv(output + '/section_train.txt', header=None, names=['row'])
         section_train = pd.DataFrame(section_train.row.str.split('_').tolist(), columns=['aline', 'section'])
 
-        print(section_train)
+        section_val = pd.read_csv(output + '/section_val.txt', header=None, names=['row'])
+        section_val = pd.DataFrame(section_val.row.str.split('_').tolist(), columns=['aline', 'section'])
 
         # test
-        i_section_train = pd.DataFrame([x for x in section_train.section if (section_train.aline == 'i').bool])
-        x_section_train = pd.DataFrame([x for x in section_train.section if (section_train.aline == 'x').bool])
-
-        modules_i = pd.DataFrame([int(x) % SLICE_STEPS for x in i_section_train])
-        modules_x = pd.DataFrame([int(x) % SLICE_STEPS for x in x_section_train])
-
-        zero_i = modules_i.sum(axis=1)
-        zero_x = modules_x.sum(axis=1)
-
-        assert int(zero_i) == 0
-        assert int(zero_x) == 0
+        assert (float(section_train.section[1]) - float(section_train.section[0])) % float(SLICE_STEPS) == 0.0
+        assert (float(section_val.section[1]) - float(section_val.section[0])) % float(SLICE_STEPS) > 0.0

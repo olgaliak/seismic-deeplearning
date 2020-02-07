@@ -36,9 +36,8 @@ def _get_aline_range(aline, per_val, slice_steps):
             raise ValueError('slice_steps cannot be a negative number')
         # Inline and Crossline sections
         test_aline = math.floor(aline * per_val / 2)
-        test_aline_range = itertools.chain(range(0, test_aline), range(aline - test_aline, aline, slice_steps))
+        test_aline_range = itertools.chain(range(0, test_aline), range(aline - test_aline, aline))
         train_aline_range = range(test_aline, aline - test_aline, slice_steps)
-
         return train_aline_range, test_aline_range
     except (Exception, ValueError):
         raise
@@ -294,6 +293,9 @@ class SplitTrainValCLI(object):
                 Defaults to 0.2.
             log_config (str): path to log configurations
         """
+        if data_dir is not None:
+            label_file = path.join(data_dir, label_file)
+        output_dir = path.join(data_dir, output_dir)
         return split_section_train_val(data_dir, output_dir, label_file, slice_steps, per_val, log_config)
 
     def patch(self, label_file, stride, patch,
