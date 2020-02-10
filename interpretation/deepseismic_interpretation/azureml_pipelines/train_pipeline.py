@@ -39,7 +39,10 @@ class TrainPipeline(DeepSeismicAzMLPipeline):
             except KeyError:
                 self.last_output_data = None
 
-            script_params = step['arguments'] + ['--input', input_data, '--output', self.last_output_data]
+            script_params = step['arguments'] + ['--input', input_data]
+            
+            if self.last_output_data is not None:
+                script_params = script_params + ['--output', self.last_output_data]
 
             self._create_pipeline_step(step=step,
                                       arguments=script_params,

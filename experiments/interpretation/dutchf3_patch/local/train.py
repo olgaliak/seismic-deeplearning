@@ -77,7 +77,7 @@ def prepare_batch(batch, device=None, non_blocking=False):
     )
 
 
-def run(*options, cfg=None, debug=False, input=None, output=None):
+def run(*options, cfg=None, debug=False, input=None):
     """Run training and validation of model
 
     Notes:
@@ -92,7 +92,6 @@ def run(*options, cfg=None, debug=False, input=None, output=None):
         cfg (str, optional): Location of config file to load. Defaults to None.
         debug (bool): Places scripts in debug/test mode and only executes a few iterations
         input (str, optional): Location of data if Azure ML run
-        output (str, optional): Location for output if Azure ML run
     """
 
     update_config(config, options=options, config_file=cfg)
@@ -105,8 +104,7 @@ def run(*options, cfg=None, debug=False, input=None, output=None):
 
     if input is not None:
         data_dir = input
-    if output is not None:
-        output_dir = output
+        output_dir = data_dir + output_dir
 
     # Start logging
     load_log_configuration(config.LOG_CONFIG)
