@@ -91,7 +91,8 @@ def run(*options, cfg=None, debug=False, input=None):
                                       default.py
         cfg (str, optional): Location of config file to load. Defaults to None.
         debug (bool): Places scripts in debug/test mode and only executes a few iterations
-        input (str, optional): Location of data if Azure ML run
+        input (str, optional): Location of data if Azure ML run, 
+            for local runs input is config.DATASET.ROOT
     """
 
     update_config(config, options=options, config_file=cfg)
