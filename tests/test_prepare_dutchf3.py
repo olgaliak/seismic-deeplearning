@@ -34,7 +34,7 @@ def test_get_aline_range_step_zero():
 
     """check if a ValueError exception is raised when slice_steps = 0
     """
-    with pytest.raises(ValueError, match=r'range\(\) arg 3 must not be zero'):
+    with pytest.raises(ValueError, match=r'slice_steps cannot be zero or a negative number'):
         SLICE_STEPS = 0
 
         # Test
@@ -49,7 +49,7 @@ def test_get_aline_range_negative_step():
 
     """check if a ValueError exception is raised when slice_steps = -1
     """
-    with pytest.raises(ValueError, match='slice_steps cannot be a negative number'):
+    with pytest.raises(ValueError, match='slice_steps cannot be zero or a negative number'):
         SLICE_STEPS = -1
 
         # Test
@@ -164,7 +164,6 @@ def test_prepare_dutchf3_patch_step_2():
         patch_train = pd.read_csv(output + '/patch_train.txt', header=None, names=['row', 'a', 'b'])
         patch_train = pd.DataFrame(patch_train.row.str.split('_').tolist(), columns=['aline', 'x', 'y', 'z'])
 
-        # test
         # test
         assert (float(patch_train.y[1]) - float(patch_train.y[0])) % float(SLICE_STEPS) == 0.0
         assert (float(patch_train.x[len(patch_train.x)-2]) - float(patch_train.x[len(patch_train.x)-1])) % float(SLICE_STEPS) == 0.0

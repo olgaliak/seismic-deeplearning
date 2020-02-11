@@ -35,8 +35,8 @@ def _write_split_files(splits_path, train_list, test_list, loader_type):
 
 def _get_aline_range(aline, per_val, slice_steps):
     try:
-        if slice_steps < 0:
-            raise ValueError('slice_steps cannot be a negative number')
+        if slice_steps < 1:
+            raise ValueError('slice_steps cannot be zero or a negative number')
         # Inline and Crossline sections
         test_aline = math.floor(aline * per_val / 2)
         test_aline_range = itertools.chain(range(0, test_aline),
@@ -60,8 +60,10 @@ def split_section_train_val(data_dir, output_dir, label_file, per_val=0.2,
         per_val (float, optional):  the fraction of the volume to use for
             validation. Defaults to 0.2.
         log_config (str): path to log configurations
-        slice_steps (int): number of slices to be skipped. Defaults to 1.
-        
+        slice_steps (int): increment to the slices count.
+            If slice_steps > 1 the function will skip:
+                slice_steps - 1 slice.
+            Defaults to 1, do not skip any slice.
     """
 
     if log_config is not None:
@@ -79,22 +81,16 @@ def split_section_train_val(data_dir, output_dir, label_file, per_val=0.2,
 
     iline, xline, _ = labels.shape
     # Inline sections
-    try:
-        train_iline_range, test_iline_range = _get_aline_range(iline,
-                                                               per_val,
-                                                               slice_steps)
-    except RuntimeError as re:
-        logger.error(re)
+    train_iline_range, test_iline_range = _get_aline_range(iline,
+                                                           per_val,
+                                                           slice_steps)
     train_i_list = ["i_" + str(i) for i in train_iline_range]
     test_i_list = ["i_" + str(i) for i in test_iline_range]
 
     # Xline sections
-    try:
-        train_xline_range, test_xline_range = _get_aline_range(xline,
-                                                               per_val,
-                                                               slice_steps)
-    except RuntimeError as re:
-        logger.error(re)
+    train_xline_range, test_xline_range = _get_aline_range(xline,
+                                                           per_val,
+                                                           slice_steps)
     train_x_list = ["x_" + str(x) for x in train_xline_range]
     test_x_list = ["x_" + str(x) for x in test_xline_range]
 
@@ -121,7 +117,10 @@ def split_patch_train_val(data_dir, output_dir, label_file, stride, patch_size,
         per_val (float, optional):  the fraction of the volume to use for
             validation. Defaults to 0.2.
         log_config (str): path to log configurations
-        slice_steps (int): number of slices to be skipped. Defaults to 1.
+        slice_steps (int): increment to the slices count.
+            If slice_steps > 1 the function will skip:
+                slice_steps - 1 slice.
+            Defaults to 1, do not skip any slice.
     """
 
     if log_config is not None:
@@ -139,20 +138,14 @@ def split_patch_train_val(data_dir, output_dir, label_file, stride, patch_size,
 
     iline, xline, depth = labels.shape
     # Inline sections
-    try:
-        train_iline_range, test_iline_range = _get_aline_range(iline,
-                                                               per_val,
-                                                               slice_steps)
-    except RuntimeError as re:
-        logger.error(re)
+    train_iline_range, test_iline_range = _get_aline_range(iline,
+                                                           per_val,
+                                                           slice_steps)
 
     # Xline sections
-    try:
-        train_xline_range, test_xline_range = _get_aline_range(xline,
-                                                               per_val,
-                                                               slice_steps)
-    except RuntimeError as re:
-        logger.error(re)
+    train_xline_range, test_xline_range = _get_aline_range(xline,
+                                                           per_val,
+                                                           slice_steps)
 
     # Generate patches from sections
     # Process inlines
@@ -340,7 +333,10 @@ class SplitTrainValCLI(object):
             per_val (float, optional):  the fraction of the volume to use for
                 validation. Defaults to 0.2.
             log_config (str): path to log configurations
-            slice_steps (int): number of slices to be skipped. Defaults to 1.
+            slice_steps (int): increment to the slices count.
+                If slice_steps > 1 the function will skip:
+                    slice_steps - 1 slice.
+                Defaults to 1, do not skip any slice.
             log_config (str): path to log configurations
         """
         if data_dir is not None:
@@ -352,8 +348,7 @@ class SplitTrainValCLI(object):
     def patch(self, label_file, stride, patch_size,
               per_val=0.2, log_config="train/deepseismic/configs/logging.conf",
               data_dir=None, output_dir=None, slice_steps=1):
-        """Generate patch based train and validation files for Netherlands F3
-        dataset.
+        """Generate train and validation files for Netherlands F3 dataset.
 
         Args:
             data_dir (str): data directory path
@@ -364,13 +359,16 @@ class SplitTrainValCLI(object):
             per_val (float, optional):  the fraction of the volume to use for
                 validation. Defaults to 0.2.
             log_config (str): path to log configurations
-            slice_steps (int): number of slices to be skipped. Defaults to 1.
+            slice_steps (int): increment to the slices count.
+                If slice_steps > 1 the function will skip:
+                    slice_steps - 1 slice.
+                Defaults to 1, do not skip any slice.
         """
         if data_dir is not None:
             label_file = path.join(data_dir, label_file)
         output_dir = path.join(data_dir, output_dir)
         return split_patch_train_val(output_dir, label_file,
-                                     stride, patch,
+                                     stride, patch_size,
                                      per_val, log_config,
                                      slice_steps)
 
