@@ -20,7 +20,7 @@ class TestNormalizeCube:
 
     testcube = None  # Set by npy_files fixture
 
-    def test_normalize_cube(self):
+    def test_normalize_cube_returns_normalized_values(self):
         """
             Test method that normalize one cube by checking if normalized 
             values are within [min, max] range.
@@ -38,7 +38,7 @@ class TestNormalizeCube:
         assert np.amax(norm_block) <= MAX_RANGE
         assert np.amin(norm_block) >= MIN_RANGE
 
-    def test_clip_cube(self):
+    def test_clip_cube_returns_clipped_values(self):
         """
             Test method that clip one cube by checking if clipped 
             values are within [min_clip, max_clip] range.
@@ -46,8 +46,8 @@ class TestNormalizeCube:
         trace = np.linspace(-1, 1, 100, True, dtype=np.single)
         cube = np.ones((100, 50, 100)) * trace * 500
         # Add values to clip
-        cube[40,25,50] = 700
-        cube[70,30,70] = -700
+        cube[40, 25, 50] = 700
+        cube[70, 30, 70] = -700
         mean = np.mean(cube)
         variance = np.var(cube)
         stddev = np.sqrt(variance)
@@ -66,7 +66,7 @@ class TestNormalizeCube:
         norm_v = dataprep.norm_value(input_value, min_clip, max_clip, MIN_RANGE, MAX_RANGE, scale)
         assert norm_v == pytest.approx(expected_norm_value, rel=1e-3)
 
-    def test_norm_value_is_correct(self):
+    def test_clip_value_is_correct(self):
         # Check if normalized value is calculated correctly
         min_clip = -18469.875210304104
         max_clip = 18469.875210304104
@@ -79,6 +79,8 @@ class TestNormalizeCube:
         # Check if normalized value is within [MIN_RANGE, MAX_RANGE]
         trace = np.linspace(-1, 1, 100, True, dtype=np.single)
         cube = np.ones((100, 50, 100)) * trace * 500
+        cube[40, 25, 50] = 7000
+        cube[70, 30, 70] = -7000
         variance = np.var(cube)
         stddev = np.sqrt(variance)
         mean = np.mean(cube)
@@ -95,6 +97,8 @@ class TestNormalizeCube:
         # Check if clipped value is within [min_clip, max_clip]
         trace = np.linspace(-1, 1, 100, True, dtype=np.single)
         cube = np.ones((100, 50, 100)) * trace * 500
+        cube[40, 25, 50] = 7000
+        cube[70, 30, 70] = -7000
         variance = np.var(cube)
         mean = np.mean(cube)
         stddev = np.sqrt(variance)
@@ -119,14 +123,16 @@ class TestNormalizeCube:
         pytest.raises(Exception, dataprep.compute_statistics, stddev, MAX_RANGE, 0)
         pytest.raises(Exception, dataprep.compute_statistics, 0, MAX_RANGE, 0)
 
-
-    def test_apply(self):
-        trace = np.linspace(-1,1,100,True,dtype=np.single)
-        cube = np.ones((100,50,100)) * trace * 500
+    def test_apply_should_clip_and_normalize_data(self):
+        # Check that apply method will clip and normalize the data
+        trace = np.linspace(-1, 1, 100, True, dtype=np.single)
+        cube = np.ones((100, 50, 100)) * trace * 500
+        cube[40, 25, 50] = 7000
+        cube[70, 30, 70] = -7000
         variance = np.var(cube)
         stddev = np.sqrt(variance)
         mean = np.mean(cube)
-        norm_block = dataprep.apply(cube, stddev, mean, K, MIN_RANGE, MAX_RANGE)
+        norm_block = dataprep.apply(cube, stddev, mean, K, MIN_RANGE, MAX_RANGE, normalize=True)
         assert np.amax(norm_block) <= MAX_RANGE
         assert np.amin(norm_block) >= MIN_RANGE
 

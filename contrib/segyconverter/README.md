@@ -40,6 +40,8 @@ To use this script, follow these examples:
 
 There are several additional command line arguments that may be needed to load specific segy files (i.e. the byte locations for data headers may be different). Run --help to review the additional commands if needed.
 
+NOTE: Missing traces will be filled in with zero values. A future enhancement to this script should allow for specific values to be used that can be ignored during training.
+
 ## Testing
 
 Run pytest from the segyconverter directory to run the local unit tests
