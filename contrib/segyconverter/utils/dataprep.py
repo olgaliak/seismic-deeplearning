@@ -1,4 +1,5 @@
-# pylint: disable=import-error
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
 
 """
 Utility Script to normalize one cube

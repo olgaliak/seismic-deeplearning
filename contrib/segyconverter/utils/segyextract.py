@@ -1,3 +1,5 @@
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
 """
 Methods for processing segy files that do not include well formed geometry. In these cases, segyio
 cannot infer the 3D volume of data from the traces so this module needs to do that manually
