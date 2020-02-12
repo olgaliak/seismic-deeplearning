@@ -11,7 +11,7 @@ OUTPUT = None
 ILINE = XLINE = DEPTH = 111
 ALINE = np.zeros((ILINE, XLINE, DEPTH))
 STRIDE = 100
-PATCH = 100
+PATCH = 50
 PER_VAL = 0.2
 LOG_CONFIG = None
 
@@ -107,7 +107,6 @@ def test_prepare_dutchf3_patch_step_1():
     """
     # setting a value to SLICE_STEPS as needed to test the values
     SLICE_STEPS = 1
-    r = 0
 
     # use a temp dir that will be discarded at the end of the execution
     with tempfile.TemporaryDirectory() as tmpdirname:
@@ -127,17 +126,21 @@ def test_prepare_dutchf3_patch_step_1():
         patch_train = pd.read_csv(output + '/patch_train.txt', header=None, names=['row', 'a', 'b'])
         patch_train = pd.DataFrame(patch_train.row.str.split('_').tolist(), columns=['aline', 'x', 'y', 'z'])
 
-        # test
-        assert (float(patch_train.y[1]) - float(patch_train.y[0])) % float(SLICE_STEPS) == 0.0
-        assert (float(patch_train.x[len(patch_train.x)-2]) - float(patch_train.x[len(patch_train.x)-1])) % float(SLICE_STEPS) == 0.0
+        # test patch_train and slice_steps=1
+        y = list(sorted(set(patch_train.y.astype(int))))
+        x = list(sorted(set(patch_train.x.astype(int)),reverse=True))
+        assert (float(y[2]) - float(y[1])) == float(SLICE_STEPS)
+        assert (float(x[1]) - float(x[2])) == float(SLICE_STEPS)
 
         # reading the file and splitting the data
         patch_val = pd.read_csv(output + '/patch_val.txt', header=None, names=['row', 'a', 'b'])
         patch_val = pd.DataFrame(patch_val.row.str.split('_').tolist(), columns=['aline', 'x', 'y', 'z'])
 
-        # test
-        assert (float(patch_val.y[1]) - float(patch_val.y[0])) % float(SLICE_STEPS) == 0.0
-        assert (float(patch_val.x[len(patch_val.x)-2]) - float(patch_val.x[len(patch_val.x)-1])) % float(SLICE_STEPS) == 0.0
+        # test patch_val and slice_steps=1
+        y = list(sorted(set(patch_val.y.astype(int))))
+        x = list(sorted(set(patch_val.x.astype(int)),reverse=True))
+        assert (float(y[2]) - float(y[1])) == float(SLICE_STEPS)
+        assert (float(x[1]) - float(x[2])) == float(SLICE_STEPS)
 
 def test_prepare_dutchf3_patch_step_2():
 
@@ -164,17 +167,21 @@ def test_prepare_dutchf3_patch_step_2():
         patch_train = pd.read_csv(output + '/patch_train.txt', header=None, names=['row', 'a', 'b'])
         patch_train = pd.DataFrame(patch_train.row.str.split('_').tolist(), columns=['aline', 'x', 'y', 'z'])
 
-        # test
-        assert (float(patch_train.y[1]) - float(patch_train.y[0])) % float(SLICE_STEPS) == 0.0
-        assert (float(patch_train.x[len(patch_train.x)-2]) - float(patch_train.x[len(patch_train.x)-1])) % float(SLICE_STEPS) == 0.0
+        # test patch_train and slice_steps=2
+        y = list(sorted(set(patch_train.y.astype(int))))
+        x = list(sorted(set(patch_train.x.astype(int)),reverse=True))
+        assert (float(y[2]) - float(y[1])) == float(SLICE_STEPS)
+        assert (float(x[1]) - float(x[2])) == float(SLICE_STEPS)
 
         # reading the file and splitting the data
         patch_val = pd.read_csv(output + '/patch_val.txt', header=None, names=['row', 'a', 'b'])
         patch_val = pd.DataFrame(patch_val.row.str.split('_').tolist(), columns=['aline', 'x', 'y', 'z'])
 
-        # test
-        assert (float(patch_val.y[1]) - float(patch_val.y[0])) % float(SLICE_STEPS) > 0.0
-        assert (float(patch_val.x[len(patch_val.x)-2]) - float(patch_val.x[len(patch_val.x)-1])) % float(SLICE_STEPS) > 0.0
+        # test patch_val and slice_steps=2
+        y = list(sorted(set(patch_val.y.astype(int))))
+        x = list(sorted(set(patch_val.x.astype(int)),reverse=True))
+        assert (float(y[2]) - float(y[1])) != float(SLICE_STEPS)
+        assert (float(x[1]) - float(x[2])) != float(SLICE_STEPS)
 
 def test_prepare_dutchf3_section_step_1():
 
