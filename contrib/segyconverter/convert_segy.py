@@ -1,3 +1,5 @@
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
 """
 Utility Script to convert segy files to blocks of numpy arrays and save to individual npy files
 """
