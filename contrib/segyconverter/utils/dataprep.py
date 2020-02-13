@@ -100,15 +100,19 @@ def clip_cube(cube: np.array, min_clip: float, max_clip: float):
     return clip_cube
 
 
-def apply(cube: np.array, stddev: float, mean: float, k: float, min_range: float, max_range: float, normalize=True):
+def apply(cube: np.array, stddev: float, mean: float, k: float, min_range: float, max_range: float,
+          clip=True, normalize=True):
     """
-    Compute statistics and normalize cube
+    Preapre data according to provided parameters. This method will compute satistics and can
+    normalize&clip, just clip, or leave the data as is. 
     :param cube: 3D array to be normalized
     :param stddev: standard deviation value
     :param k: number of standard deviation to be used in normalization
     :param min_range: minium range value
     :param max_range: maximum range value
-    :returns: normalized 3D array
+    :param clip: flag to turn on/off clip
+    :param normalize: flag to turn on/off normalization.
+    :returns: processed 3D array
     :rtype: numpy array
     """
     if np.isnan(np.min(cube)):
@@ -121,10 +125,13 @@ def apply(cube: np.array, stddev: float, mean: float, k: float, min_range: float
     # Compute statistics
     min_clip, max_clip, scale = compute_statistics(stddev=stddev, mean=mean, k=k, max_range=max_range)
 
-    if not normalize:
+    if (clip and normalize) or normalize:
+        # Normalize&clip cube. Note that it is not possible to normalize data without 
+        # applying clip operation
+        print("Normalizing and Clipping File")
+        return normalize_cube(cube=cube, min_clip=min_clip, max_clip=max_clip, scale=scale, 
+                              min_range=min_range, max_range=max_range)
+    elif clip:
         # Only clip values
+        print("Clipping File")
         return clip_cube(cube=cube, min_clip=min_clip, max_clip=max_clip)
-    else:
-        # Normalize cube
-        return normalize_cube(cube=cube, min_clip=min_clip, max_clip=max_clip, scale=scale, min_range=min_range,
-                              max_range=max_range)

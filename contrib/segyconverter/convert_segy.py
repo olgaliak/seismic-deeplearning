@@ -13,7 +13,7 @@ import utils.dataprep as dataprep
 import json
 
 
-def _filter_data(output_dir, stddev_file, k, min_range, max_range, normalize):
+def _filter_data(output_dir, stddev_file, k, min_range, max_range, clip, normalize):
     """
     Normalization step on all files in output_dir. This function overwrites the existing
     data file
@@ -22,6 +22,8 @@ def _filter_data(output_dir, stddev_file, k, min_range, max_range, normalize):
     :param int k: number of standard deviation to be used in normalization
     :param float min_range: minium range value
     :param float max_range: maximum range value
+    :param clip: flag to turn on/off clip
+    :param normalize: flag to turn on/off normalization.
     """
     txt_file = os.path.join(output_dir, stddev_file)
     if not os.path.isfile(txt_file):
@@ -39,11 +41,14 @@ def _filter_data(output_dir, stddev_file, k, min_range, max_range, normalize):
     npy_files = list(f for f in os.listdir(output_dir) if f.endswith('.npy'))
     for local_filename in npy_files:
         cube = np.load(os.path.join(output_dir, local_filename))
-        norm_cube = dataprep.apply(cube, stddev, mean, k, min_range, max_range, normalize=normalize)
+        if normalize or clip:
+            norm_cube = dataprep.apply(cube, stddev, mean, k, min_range, max_range, 
+                                       clip=clip, normalize=normalize)
         np.save(os.path.join(output_dir, local_filename), norm_cube)
 
 
-def main(input_file, output_dir, prefix, iline=189, xline=193, metadata_only=False, stride=128, cube_size=-1, normalize=True, clip=True, input=None):
+def main(input_file, output_dir, prefix, iline=189, xline=193, metadata_only=False, stride=128, 
+         cube_size=-1, normalize=True, clip=True, input=None):
     """
     Select a single column out of the segy file and generate all cubes in the z(time)
     direction. The column is indexed by the inline and xline. To use this command, you
@@ -95,17 +100,11 @@ def main(input_file, output_dir, prefix, iline=189, xline=193, metadata_only=Fal
             process_time_segy = timeit.timeit(wrapped_processor_segy, number=1)
         print(f"Completed SEG-Y converstion in: {process_time_segy}")
         # At this point, there should be npy files in the output directory + one file containing the std deviation found in the segy
-        if normalize:
-            print("Normalizing and Clipping File")
-            timed_filter_data = segyextract.timewrapper(_filter_data, output_dir, f"{prefix}_stats.json", 12, 0, 1, normalize)
-            process_time_normalize = timeit.timeit(timed_filter_data, number=1)
-            print(f"Completed normalization and clipping in {process_time_normalize} seconds")
-        elif clip:
-            normalize = False
-            print("Clipping File")
-            timed_filter_data = segyextract.timewrapper(_filter_data, output_dir, f"{prefix}_stats.json", 12, 0, 1, normalize)
-            process_time_normalize = timeit.timeit(timed_filter_data, number=1)
-            print(f"Completed clipping in {process_time_normalize} seconds")
+        print("Preparing File")
+        timed_filter_data = segyextract.timewrapper(_filter_data, output_dir, f"{prefix}_stats.json", 12, 0, 1, 
+                                                    clip=clip, normalize=normalize)
+        process_time_normalize = timeit.timeit(timed_filter_data, number=1)
+        print(f"Completed file preparation in {process_time_normalize} seconds")
 
 
 if __name__ == '__main__':

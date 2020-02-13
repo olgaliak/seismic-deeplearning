@@ -133,7 +133,12 @@ class TestNormalizeCube:
         variance = np.var(cube)
         stddev = np.sqrt(variance)
         mean = np.mean(cube)
-        norm_block = dataprep.apply(cube, stddev, mean, K, MIN_RANGE, MAX_RANGE, normalize=True)
+
+        norm_block = dataprep.apply(cube, stddev, mean, K, MIN_RANGE, MAX_RANGE)
+        assert np.amax(norm_block) <= MAX_RANGE
+        assert np.amin(norm_block) >= MIN_RANGE
+
+        norm_block = dataprep.apply(cube, stddev, mean, K, MIN_RANGE, MAX_RANGE, clip=False)
         assert np.amax(norm_block) <= MAX_RANGE
         assert np.amin(norm_block) >= MIN_RANGE
 
@@ -143,3 +148,23 @@ class TestNormalizeCube:
         invalid_cube = np.empty_like(cube)
         invalid_cube[:] = np.nan
         pytest.raises(Exception, dataprep.apply, invalid_cube, stddev, 0, MIN_RANGE, MAX_RANGE)
+
+    def test_apply_should_clip_data(self):
+        # Check that apply method will clip the data
+        trace = np.linspace(-1, 1, 100, True, dtype=np.single)
+        cube = np.ones((100, 50, 100)) * trace * 500
+        cube[40, 25, 50] = 7000
+        cube[70, 30, 70] = -7000
+        variance = np.var(cube)
+        stddev = np.sqrt(variance)
+        mean = np.mean(cube)
+        min_clip, max_clip, _ = dataprep.compute_statistics(stddev, mean, MAX_RANGE, K)
+        norm_block = dataprep.apply(cube, stddev, mean, K, MIN_RANGE, MAX_RANGE, clip=True,
+                                    normalize=False)
+        assert np.amax(norm_block) <= max_clip
+        assert np.amin(norm_block) >= min_clip
+
+        invalid_cube = np.empty_like(cube)
+        invalid_cube[:] = np.nan
+        pytest.raises(Exception, dataprep.apply, invalid_cube, stddev, 0, MIN_RANGE, MAX_RANGE,
+                      clip=True, normalize=False)
