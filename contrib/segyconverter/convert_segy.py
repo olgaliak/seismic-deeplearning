@@ -12,6 +12,9 @@ import utils.segyextract as segyextract
 import utils.dataprep as dataprep
 import json
 
+K = 12
+MIN_VAL = 0
+MAX_VAL = 1
 
 def _filter_data(output_dir, stddev_file, k, min_range, max_range, clip, normalize):
     """
@@ -42,9 +45,9 @@ def _filter_data(output_dir, stddev_file, k, min_range, max_range, clip, normali
     for local_filename in npy_files:
         cube = np.load(os.path.join(output_dir, local_filename))
         if normalize or clip:
-            norm_cube = dataprep.apply(cube, stddev, mean, k, min_range, max_range, 
+            cube = dataprep.apply(cube, stddev, mean, k, min_range, max_range, 
                                        clip=clip, normalize=normalize)
-        np.save(os.path.join(output_dir, local_filename), norm_cube)
+        np.save(os.path.join(output_dir, local_filename), cube)
 
 
 def main(input_file, output_dir, prefix, iline=189, xline=193, metadata_only=False, stride=128, 
@@ -101,8 +104,8 @@ def main(input_file, output_dir, prefix, iline=189, xline=193, metadata_only=Fal
         print(f"Completed SEG-Y converstion in: {process_time_segy}")
         # At this point, there should be npy files in the output directory + one file containing the std deviation found in the segy
         print("Preparing File")
-        timed_filter_data = segyextract.timewrapper(_filter_data, output_dir, f"{prefix}_stats.json", 12, 0, 1, 
-                                                    clip=clip, normalize=normalize)
+        timed_filter_data = segyextract.timewrapper(_filter_data, output_dir, f"{prefix}_stats.json",
+                                                    K, MIN_VAL, MAX_VAL, clip=clip, normalize=normalize)
         process_time_normalize = timeit.timeit(timed_filter_data, number=1)
         print(f"Completed file preparation in {process_time_normalize} seconds")
 
