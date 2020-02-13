@@ -1,4 +1,4 @@
-git+https://github.com/olgaliak/seismic-deeplearning.git@azureml-train-pipeline#egg=cv_lib&subdirectory=cv_lib
+git+https://github.com/microsoft/seismic-deeplearning.git@contrib#egg=cv_lib&subdirectory=cv_lib
 git+https://github.com/microsoft/seismic-deeplearning.git#egg=deepseismic-interpretation&subdirectory=interpretation
 opencv-python==4.1.2.30
 numpy>=1.17.0
