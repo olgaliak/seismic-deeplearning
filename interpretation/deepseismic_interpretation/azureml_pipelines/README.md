@@ -12,8 +12,7 @@ AML_COMPUTE_CLUSTER_MIN_NODES
 AML_COMPUTE_CLUSTER_MAX_NODES
 AML_COMPUTE_CLUSTER_SKU
 ```
-On Windows you can use:
-`set VARIABLE=value`
+
 On Linux:
 `export VARIABLE=value`
 These can be set automatically in VSCode in an .env file, run with `source .env` in Linux or made into a `.bat` file to easily run from the command line in Windows. You can ask a team member for a .env file configured for our development environment to save time.
