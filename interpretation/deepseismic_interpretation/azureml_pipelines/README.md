@@ -15,7 +15,7 @@ AML_COMPUTE_CLUSTER_SKU
 
 On Linux:
 `export VARIABLE=value`
-These can be set automatically in VSCode in an .env file, run with `source .env` in Linux or made into a `.bat` file to easily run from the command line in Windows. You can ask a team member for a .env file configured for our development environment to save time.
+These can be set automatically in VSCode in an .env file or run with `source .env` in Linux. An example .env file is found at the ROOT of this repo [here](../../../.env.example). You can rename this to .env. Feel free to use this as your .env file but be sure to add this to your .gitignore to ensure you do not commit any secrets. 
 
 Create a .azureml/config.json file in the project's root directory that looks like so:
 ```json
@@ -26,6 +26,8 @@ Create a .azureml/config.json file in the project's root directory that looks li
 }
 
 ```
+At the ROOT of this repo you will find an example [here](../../../.azureml.example/config.json). This is an example please rename the file to .azureml/config.json, input your account information and add this to your .gitignore. 
+
 
 ## Training Pipeline
 Here's an example of a possible config file:
@@ -108,7 +110,7 @@ parser.add_argument('--output', type=str, help='output from training')
 # Configuring a Pipeline
   
 ## Train Pipeline
-Define parameters for the run in a config file. See an example [here](../pipeline_config.json)
+Define parameters for the run in a config file. See an example [here](pipeline_config.json)
 ```json
 {
     "step1":
