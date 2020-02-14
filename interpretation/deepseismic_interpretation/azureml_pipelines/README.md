@@ -173,4 +173,4 @@ to get this to run, you will also need to `pip install azure-cli-core`
 Then you can go back and follow the instructions above, including az login and setting the subscription, and kick off the pipeline.
   
 ## Cancelling a Pipeline Run
-If you kicked off a pipeline and want to cancel it, run the [cancel_run.py](dev/cancel_run.py) script with the corresponding run_id and step_id.
+If you kicked off a pipeline and want to cancel it, run the [cancel_run.py](dev/cancel_run.py) script with the corresponding run_id and step_id. The corresponding run_id and step_id will be printed once you have run the script. You can also find this information when viewing your run in the portal https://portal.azure.com/. If you would prefer to cancel your run in the portal you may also do this as well.
