@@ -1,5 +1,24 @@
 # Integrating with AzureML
 
+## AzureML Pipeline Background 
+
+Azure Machine Learning is a cloud-based environment you can use to train, deploy, automate, manage, and track ML models.
+
+An Azure Machine Learning pipeline is an independently executable workflow of a complete machine learning task. Subtasks are encapsulated as a series of steps within the pipeline. An Azure Machine Learning pipeline can be as simple as one that calls a Python script, so may do just about anything. Pipelines should focus on machine learning tasks such as:
+
+- Data preparation including importing, validating and cleaning, munging and transformation, normalization, and staging
+- Training configuration including parameterizing arguments, filepaths, and logging / reporting configurations
+- Training and validating efficiently and repeatedly. Efficiency might come from specifying specific data subsets, different hardware compute resources, distributed processing, and progress monitoring
+- Deployment, including versioning, scaling, provisioning, and access control
+
+An Azure ML pipeline performs a complete logical workflow with an ordered sequence of steps. Each step is a discrete processing action. Pipelines run in the context of an Azure Machine Learning Experiment.
+In the early stages of an ML project, it's fine to have a single Jupyter notebook or Python script that does all the work of Azure workspace and resource configuration, data preparation, run configuration, training, and validation. But just as functions and classes quickly become preferable to a single imperative block of code, ML workflows quickly become preferable to a monolithic notebook or script.
+By modularizing ML tasks, pipelines support the Computer Science imperative that a component should "do (only) one thing well." Modularity is clearly vital to project success when programming in teams, but even when working alone, even a small ML project involves separate tasks, each with a good amount of complexity. Tasks include: workspace configuration and data access, data preparation, model definition and configuration, and deployment. While the outputs of one or more tasks form the inputs to another, the exact implementation details of any one task are, at best, irrelevant distractions in the next. At worst, the computational state of one task can cause a bug in another.
+
+There are many ways to leverage AzureML. Currently DeepSeismic has integrated with AzureML to train a pipeline, which will include creating an experiment titled "DEV-train-pipeline" which will contain all training runs, associated logs, and the ability to navigate seemlessly through this information. AzureML will take data from a blob storage account and the associated models will be saved to this account upon completeion of the run.
+
+Please refer to microsoft docs for additional information on AzureML pipelines and related capabilities https://docs.microsoft.com/en-us/azure/machine-learning/concept-ml-pipelines
+
 ## Running a Pipeline in AzureML
 Set the following environment variables:
 ```
