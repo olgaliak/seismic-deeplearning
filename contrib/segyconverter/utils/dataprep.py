@@ -6,7 +6,6 @@ Utility Script to normalize one cube
 """
 
 import numpy as np
-import argparse
 
 
 def compute_statistics(stddev: float, mean: float, max_range: float, k: int):
