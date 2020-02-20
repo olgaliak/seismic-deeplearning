@@ -14,6 +14,7 @@ import json
 
 FAST = 'fast'
 SLOW = 'slow'
+DEFAULT_VALUE = 255
 
 
 def get_segy_metadata(input_file, iline, xline):
@@ -78,7 +79,8 @@ def process_segy_data_into_single_array(input_file, output_dir, prefix, iline=18
                                         & (trace_headers.slow >= layer_slowmin)
                                         & (trace_headers.slow <= layer_slowmax)]
 
-        block = np.zeros((len(fast_distinct), len(slow_distinct), sampledepth), dtype=np.float32)
+        block = np.full((len(fast_distinct), len(slow_distinct), sampledepth), DEFAULT_VALUE,
+                        dtype=np.float32)
         for _, row in layer_trace_ids.iterrows():
             block[(row[FAST] - layer_fastmin) // fast_line_space,
                   (row[SLOW] - layer_slowmin) // slow_line_space,
