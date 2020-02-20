@@ -16,7 +16,7 @@ K = 12
 MIN_VAL = 0
 MAX_VAL = 1
 
-def _filter_data(output_dir, stddev_file, k, min_range, max_range, clip, normalize):
+def filter_data(output_dir, stddev_file, k, min_range, max_range, clip, normalize):
     """
     Normalization step on all files in output_dir. This function overwrites the existing
     data file
@@ -104,7 +104,7 @@ def main(input_file, output_dir, prefix, iline=189, xline=193, metadata_only=Fal
         print(f"Completed SEG-Y converstion in: {process_time_segy}")
         # At this point, there should be npy files in the output directory + one file containing the std deviation found in the segy
         print("Preparing File")
-        timed_filter_data = segyextract.timewrapper(_filter_data, output_dir, f"{prefix}_stats.json",
+        timed_filter_data = segyextract.timewrapper(filter_data, output_dir, f"{prefix}_stats.json",
                                                     K, MIN_VAL, MAX_VAL, clip=clip, normalize=normalize)
         process_time_normalize = timeit.timeit(timed_filter_data, number=1)
         print(f"Completed file preparation in {process_time_normalize} seconds")

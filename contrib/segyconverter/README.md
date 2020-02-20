@@ -12,30 +12,32 @@ The resulting npy files will use the following naming convention:
 
 These inline and xline ids are the upper left location of the data contained in the file and can be later used to identify where the npy file is located in the segy data.
 
+This script use [segyio](https://github.com/equinor/segyio) for interaction with SEG-Y.
+
 To use this script, follow these examples:
 
 1) Convert a SEG-Y file to a single npy file of the same dimensions:
 
     ```
-    python ./convert_segy.py --prefix {PREFIX} --input_file {SEGYFILE} --output_dir .
+    python ./convert_segy.py --input_file {SEGYFILE} --prefix {PREFIX} --output_dir .
     ```
 
 2) Convert a SEG-Y file to a single npy file of the same dimensions, clip and normalize the results:
 
     ```
-    python ./convert_segy.py --prefix {PREFIX} --input_file {SEGYFILE} --output_dir . --normalize
+    python ./convert_segy.py --input_file {SEGYFILE} --prefix {PREFIX} --output_dir . --normalize
     ```
 
 3) Convert a SEG-Y file to a single npy file of the same dimensions, clip but do not normalize the results:
 
     ```
-    python ./convert_segy.py --prefix {PREFIX} --input_file {SEGYFILE} --output_dir . --clip
+    python ./convert_segy.py --input_file {SEGYFILE} --prefix {PREFIX} --output_dir . --clip
     ```
 
 4) Split a single SEG-Y file into a set of npy files, each npy array with dimension (100,100,100)
 
     ```
-    python ./convert_segy.py --prefix {PREFIX} --input_file {SEGYFILE} --output_dir . --cube_size 100
+    python ./convert_segy.py --input_file {SEGYFILE} --prefix {PREFIX} --output_dir . --cube_size 100
     ```
 
 There are several additional command line arguments that may be needed to load specific segy files (i.e. the byte locations for data headers may be different). Run --help to review the additional commands if needed.
