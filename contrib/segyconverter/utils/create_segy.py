@@ -47,7 +47,7 @@ def parse_text_header(segyfile):
 
 
 
-def get_segy_details(segyfile):
+def show_segy_details(segyfile):
     with segyio.open(segyfile, ignore_geometry=True) as segy:
         segydf = parse_trace_headers(segy, segy.tracecount)
         print(f"Loaded from file {segyfile}")
@@ -59,7 +59,7 @@ def get_segy_details(segyfile):
         pyplot.xlabel('inline')
         pyplot.ylabel('crossline')
         pyplot.show()
-        return segydf
+
     
 
     
