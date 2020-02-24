@@ -14,7 +14,11 @@ These inline and xline ids are the upper left location of the data contained in 
 
 This script use [segyio](https://github.com/equinor/segyio) for interaction with SEG-Y.
 
-To use this script, follow these examples:
+To use this script, first activate the `seismic-interpretation` environment defined in this repository's setup instructions: 
+
+`conda activate seismic-interpretation`
+
+Then follow these examples:
 
 1) Convert a SEG-Y file to a single npy file of the same dimensions:
 
@@ -42,9 +46,9 @@ To use this script, follow these examples:
 
 There are several additional command line arguments that may be needed to load specific segy files (i.e. the byte locations for data headers may be different). Run --help to review the additional commands if needed.
 
-A good documentation about SEG-Y format can be found [here](https://seg.org/Portals/0/SEG/News%20and%20Resources/Technical%20Standards/seg_y_rev2_0-mar2017.pdf).
-Also, about data headers, we've found from the industry that those inline and crossline header location standards aren't always followed.
-Thus, maybe you need to print out the text header of the SEG-Y file and read the comments to determine what location was used. 
+Documentation about the SEG-Y format can be found [here](https://seg.org/Portals/0/SEG/News%20and%20Resources/Technical%20Standards/seg_y_rev2_0-mar2017.pdf).
+Regarding data headers, we've found from the industry that those inline and crossline header location standards aren't always followed.
+As a result, you will need to print out the text header of the SEG-Y file and read the comments to determine what location was used. 
 As far as we know, there is no way to programmatically extract this info from the file.
 
 NOTE: Missing traces will be filled in with zero values. A future enhancement to this script should allow for specific values to be used that can be ignored during training.
