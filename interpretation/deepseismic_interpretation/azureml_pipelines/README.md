@@ -17,7 +17,7 @@ By modularizing ML tasks, pipelines support the Computer Science imperative that
 
 There are many ways to leverage AzureML. Currently DeepSeismic has integrated with AzureML to train a pipeline, which will include creating an experiment titled "DEV-train-pipeline" which will contain all training runs, associated logs, and the ability to navigate seemlessly through this information. AzureML will take data from a blob storage account and the associated models will be saved to this account upon completeion of the run.
 
-Please refer to microsoft docs for additional information on AzureML pipelines and related capabilities https://docs.microsoft.com/en-us/azure/machine-learning/concept-ml-pipelines
+Please refer to microsoft docs for additional information on AzureML pipelines and related capabilities ['What are Azure Machine Learning pipelines?'](https://docs.microsoft.com/en-us/azure/machine-learning/concept-ml-pipelines) 
 
 ## Files needed for this AzureML run
 
