@@ -82,12 +82,13 @@ jobs:
       pytest -s tests/cicd/src/notebook_integration_tests.py --nbname contrib/segyconverter/01_segy_sample_files.ipynb --cwd contrib/segyconverter
 
 - job: 02_segy_convert_sample
-    dependsOn: setup
-    timeoutInMinutes: 5
-    displayName: segy convert sample
-    pool:
-      name: deepseismicagentpool
-    steps:
-    - bash: |      
-        source activate seismic-interpretation      
-        pytest -s tests/cicd/src/notebook_integration_tests.py --nbname contrib/segyconverter/02_segy_convert_sample.ipynb --cwd contrib/segyconverter
+  dependsOn: setup
+  timeoutInMinutes: 5
+  displayName: segy convert sample
+  pool:
+    name: deepseismicagentpool
+  steps:
+  - bash: |      
+      source activate seismic-interpretation      
+      pytest -s tests/cicd/src/notebook_integration_tests.py --nbname contrib/segyconverter/02_segy_convert_sample.ipynb --cwd contrib/segyconverter
+
