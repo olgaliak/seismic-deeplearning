@@ -31,7 +31,7 @@ def filter_data(output_dir, stddev_file, k, min_range, max_range, clip, normaliz
     txt_file = os.path.join(output_dir, stddev_file)
     if not os.path.isfile(txt_file):
         raise Exception("Std Deviation file could not be found")
-    with open(os.path.join(output_dir, txt_file), 'r') as f:
+    with open(os.path.join(txt_file), 'r') as f:
         metadatastr = f.read()
 
     try:
@@ -51,7 +51,7 @@ def filter_data(output_dir, stddev_file, k, min_range, max_range, clip, normaliz
 
 
 def main(input_file, output_dir, prefix, iline=189, xline=193, metadata_only=False, stride=128, 
-         cube_size=-1, normalize=True, clip=True, input=None):
+         cube_size=-1, normalize=True, clip=True):
     """
     Select a single column out of the segy file and generate all cubes in the z(time)
     direction. The column is indexed by the inline and xline. To use this command, you
@@ -71,8 +71,6 @@ def main(input_file, output_dir, prefix, iline=189, xline=193, metadata_only=Fal
     :param int cube_size: size of cubes to generate
     """
 
-    if len(input) > 0:
-        output_dir = os.path.join(input, output_dir)
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
 
@@ -130,11 +128,9 @@ if __name__ == '__main__':
                         help="stride")
     parser.add_argument("--normalize", action='store_true', help="Normalization flag -  clip and normalize the data")
     parser.add_argument("--clip", action='store_true', help="Clipping flag -  only clip the data")
-    parser.add_argument("--input", type=str, default="", help="Used when running in Azure ML Service - Path to input data")
-    parser.add_argument("--output", type=str, default="", help="Used when running in Azure ML Service - Currently ignored")
 
     args = parser.parse_args()
     localfile = args.input_file
 
     main(args.input_file, args.output_dir, args.prefix, args.iline, args.xline,
-         args.metadata_only, args.stride, args.cube_size, args.normalize, args.clip, args.input)
+         args.metadata_only, args.stride, args.cube_size, args.normalize, args.clip)
