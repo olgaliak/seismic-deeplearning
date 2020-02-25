@@ -51,7 +51,7 @@ AML_COMPUTE_CLUSTER_SKU
 
 On Linux:
 `export VARIABLE=value`
-These can be set automatically in VSCode in an .env file or run with `source .env` in Linux. An example .env file is found at the ROOT of this repo [here](../../../.env.example). You can rename this to .env. Feel free to use this as your .env file but be sure to add this to your .gitignore to ensure you do not commit any secrets. 
+Our code can pick the environment variables from the .env file; alternatively you can `source .env` to activate these variables in your environment. An example .env file is found at the ROOT of this repo [here](../../../.env.example). You can rename this to .env. Feel free to use this as your .env file but be sure to add this to your .gitignore to ensure you do not commit any secrets. 
 
 Create a .azureml/config.json file in the project's root directory that looks like so:
 ```json
