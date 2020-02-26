@@ -146,7 +146,7 @@ parser.add_argument('--output', type=str, help='output from training')
 # Configuring a Pipeline
   
 ## Train Pipeline
-Define parameters for the run in a config file. See an example [here](pipeline_config.json)
+Define parameters for the run in a pipeline configuration file. See an example [here](pipeline_config.json)
 ```json
 {
     "step1":
