@@ -27,7 +27,7 @@ You will need the following files to complete an run in AzureML
 - [.env](../../../.env.example) This is used to import your environment variables including blob storage information and AzureML compute cluster specs
 - [kickoff_train_pipeline.py](dev/kickoff_train_pipeline.py) This script shows how to run an AzureML train pipeline 
 - [cancel_run.py](dev/cancel_run.py) This script is used to cancel an AzureML train pipeline run
-- [base_pipeline.py](base_pipeline.py) This script is used as a base class and kickoff_train_pipeline.py inherits from it. This is intended to be a helpful abstraction that an an future addition of an inference pipeline can leverage
+- [base_pipeline.py](base_pipeline.py) This script is used as a base class and train_pipeline.py inherits from it. This is intended to be a helpful abstraction that an an future addition of an inference pipeline can leverage
 - [train_pipeline.py](train_pipeline.py) This script inherts from base_pipeline.py and is used to construct the pipeline and its steps. The script kickoff_train_pipeline.py will call the function defined here and the pipeline_config
 - [pipeline_config.json](pipeline_config.json) This config specifies the steps of the pipeline, location of data, and any specific arguments. This is consumed once the kickoff_train_script.py is run
 - [train.py](../../../experiments/interpretation/dutchf3_patch/local/train.py) This is the training script that is used to train the model
@@ -53,6 +53,8 @@ On Linux:
 `export VARIABLE=value`
 Our code can pick the environment variables from the .env file; alternatively you can `source .env` to activate these variables in your environment. An example .env file is found at the ROOT of this repo [here](../../../.env.example). You can rename this to .env. Feel free to use this as your .env file but be sure to add this to your .gitignore to ensure you do not commit any secrets. 
 
+
+You will nee
 Create a .azureml/config.json file in the project's root directory that looks like so:
 ```json
 {
