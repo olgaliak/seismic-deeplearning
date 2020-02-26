@@ -38,7 +38,7 @@ You will need the following files to complete an run in AzureML
 
 ## Running a Pipeline in AzureML
 
-Go into the [Azure Portal](https://portal.azure.com) and create a blob storage. Once you have created a [blob storage](https://azure.microsoft.com/en-us/services/storage/blobs/) you may use [Azure Storage Explorer](https://docs.microsoft.com/en-us/azure/vs-azure-tools-storage-manage-with-storage-explorer?tabs=windows) to manage your blob instance. You can either manually upload data through Azure Storage Explorer, or you can use [AzCopy](https://docs.microsoft.com/en-us/azure/storage/common/storage-use-azcopy-v10) to migrate the data to your blob store. Once you blob storage set up and the data migrated, you may being to fill in the environemnt variables below. There is a an example [.env file](../../../.env.example) that you may leverage. More information on how to activate these environment variables are below. 
+Go into the [Azure Portal](https://portal.azure.com) and create a blob storage. Once you have created a [blob storage](https://azure.microsoft.com/en-us/services/storage/blobs/) you may use [Azure Storage Explorer](https://docs.microsoft.com/en-us/azure/vs-azure-tools-storage-manage-with-storage-explorer?tabs=windows) to manage your blob instance. You can either manually upload data through Azure Storage Explorer, or you can use [AzCopy](https://docs.microsoft.com/en-us/azure/storage/common/storage-use-azcopy-v10) to migrate the data to your blob storage. Once you blob storage set up and the data migrated, you may being to fill in the environemnt variables below. There is a an example [.env file](../../../.env.example) that you may leverage. More information on how to activate these environment variables are below.
 
 Set the following environment variables:
 ```
@@ -56,8 +56,6 @@ On Linux:
 `export VARIABLE=value`
 Our code can pick the environment variables from the .env file; alternatively you can `source .env` to activate these variables in your environment. An example .env file is found at the ROOT of this repo [here](../../../.env.example). You can rename this to .env. Feel free to use this as your .env file but be sure to add this to your .gitignore to ensure you do not commit any secrets. 
 
-
-You will nee
 Create a .azureml/config.json file in the project's root directory that looks like so:
 ```json
 {
