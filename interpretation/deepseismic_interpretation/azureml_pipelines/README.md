@@ -185,10 +185,10 @@ az login
 az account set -s <subscription id>
 ```
 
-Kick off the training pipeline defined in your config via your python environment of choice. The code will look like this:
+Kick off the training pipeline defined in your config via your python environment of choice. First activate your local environment that has cv_lib and interpretation set up using guidance [here](../../../README.md). You will run the kick off for the training pipeline from the ROOT directory. The code will look like this:
 ```python
 from src.azml.train_pipeline.train_pipeline import TrainPipeline
-  
+  S
 orchestrator = TrainPipeline("<path to your config file>")
 orchestrator.construct_pipeline()
 run = orchestrator.run_pipeline(experiment_name="DEV-train-pipeline")
