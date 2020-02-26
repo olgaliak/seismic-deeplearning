@@ -179,11 +179,12 @@ Define parameters for the run in a pipeline configuration file. See an example [
 ```
   
 ## Kicking off a Pipeline
-In order to kick off a pipeline, you will need to use the AzureCLI to login to the subscription where your workspace resides:
+In order to kick off a pipeline, you will need to use the AzureCLI to login to the subscription where your workspace resides. Once you successfully log in, there will be a print out of all of the subscriptions you have access to. You can either get your subscription id this way or you could go directly to the azure portal, navigate to your subscriptions, and then locate the right subscription id to pass into az account set -s:
 ```bash
 az login
 az account set -s <subscription id>
 ```
+
 Kick off the training pipeline defined in your config via your python environment of choice. The code will look like this:
 ```python
 from src.azml.train_pipeline.train_pipeline import TrainPipeline
