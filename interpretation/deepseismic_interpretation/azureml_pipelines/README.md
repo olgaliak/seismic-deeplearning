@@ -122,7 +122,7 @@ parser.add_argument('--output', type=str, help='output from training')
 # Configuring a Pipeline
   
 ## Train Pipeline
-Define parameters for the run in a pipeline configuration file. See an example [here](pipeline_config.json)
+Define parameters for the run in a pipeline configuration file. See an example in this repo [here](pipeline_config.json). For additional guidance on [pipeline steps](https://docs.microsoft.com/en-us/azure/machine-learning/how-to-create-your-first-pipeline#steps) please refer to Microsoft docs.
 ```json
 {
     "step1":
