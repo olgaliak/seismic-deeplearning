@@ -40,6 +40,14 @@ You will need the following files to complete an run in AzureML
 
 Go into the [Azure Portal](https://portal.azure.com) and create a blob storage. Once you have created a [blob storage](https://azure.microsoft.com/en-us/services/storage/blobs/) you may use [Azure Storage Explorer](https://docs.microsoft.com/en-us/azure/vs-azure-tools-storage-manage-with-storage-explorer?tabs=windows) to manage your blob instance. You can either manually upload data through Azure Storage Explorer, or you can use [AzCopy](https://docs.microsoft.com/en-us/azure/storage/common/storage-use-azcopy-v10) to migrate the data to your blob storage. Once you blob storage set up and the data migrated, you may being to fill in the environemnt variables below. There is a an example [.env file](../../../.env.example) that you may leverage. More information on how to activate these environment variables are below.
 
+With your run you will need to specifiy the below compute. Once you populate these variables, AzureML will spin up a run based creation compute, this means that the compute will be created by AzureML at run time specifically for your run. The compute is deleted automatically once the run completes. With AzureML you also have the option of creating and attaching your own compute. For more information on run-based compute creation and persistent compute please refer to the [Azure Machine Learning Compute](https://docs.microsoft.com/en-us/azure/machine-learning/how-to-set-up-training-targets) section in Microsoft docs.
+
+`AML_COMPUTE_CLUSTER_SKU` refers to VM family of the nodes created by Azure Machine Learning Compute. If not specified, defaults to Standard_NC6. For compute options see [HardwareProfile object values](https://docs.microsoft.com/en-us/azure/templates/Microsoft.Compute/2019-07-01/virtualMachines?toc=%2Fen-us%2Fazure%2Fazure-resource-manager%2Ftoc.json&bc=%2Fen-us%2Fazure%2Fbread%2Ftoc.json#hardwareprofile-object
+)
+`AML_COMPUTE_CLUSTER_MAX_NODES` refers to the max number of nodes to autoscale up to when you run a job on Azure Machine Learning Compute. This is not the max number of nodes for multi-node training, instead this is for the amount of nodes available to process single-node jobs.
+
+If you would like additional information with regards AzureML compute provisioning class please refer to Microsoft docs on [AzureML compute provisioning class](https://docs.microsoft.com/en-us/python/api/azureml-core/azureml.core.compute.amlcompute.amlcomputeprovisioningconfiguration?view=azure-ml-py)
+
 Set the following environment variables:
 ```
 BLOB_ACCOUNT_NAME
@@ -56,7 +64,7 @@ On Linux:
 `export VARIABLE=value`
 Our code can pick the environment variables from the .env file; alternatively you can `source .env` to activate these variables in your environment. An example .env file is found at the ROOT of this repo [here](../../../.env.example). You can rename this to .env. Feel free to use this as your .env file but be sure to add this to your .gitignore to ensure you do not commit any secrets. 
 
-You will be able to download a config.json that will already have your subscription id, resource group, and workspace name directly in the [Azure Portal](https://portal.azure.com). You will want to navigate to your AzureML workspace and then you can click the ```Download config.json``` option towards the top left of the browser. Once you do this you can rename the .azureml.example folder to .azureml and replace the config.json with your downloaded config.json. If you would prefer to migrate the information manually refer to the guidance below.
+You will be able to download a config.json that will already have your subscription id, resource group, and workspace name directly in the [Azure Portal](https://portal.azure.com). You will want to navigate to your AzureML workspace and then you can click the `Download config.json` option towards the top left of the browser. Once you do this you can rename the .azureml.example folder to .azureml and replace the config.json with your downloaded config.json. If you would prefer to migrate the information manually refer to the guidance below.
 
 Create a .azureml/config.json file in the project's root directory that looks like so:
 ```json
