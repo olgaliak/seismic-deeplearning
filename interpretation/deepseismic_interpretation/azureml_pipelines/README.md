@@ -56,6 +56,8 @@ On Linux:
 `export VARIABLE=value`
 Our code can pick the environment variables from the .env file; alternatively you can `source .env` to activate these variables in your environment. An example .env file is found at the ROOT of this repo [here](../../../.env.example). You can rename this to .env. Feel free to use this as your .env file but be sure to add this to your .gitignore to ensure you do not commit any secrets. 
 
+You will be able to download a config.json that will already have your subscription id, resource group, and workspace name directly in the [Azure Portal](https://portal.azure.com). You will want to navigate to your AzureML workspace and then you can click the ```Download config.json``` option towards the top left of the browser. Once you do this you can rename the .azureml.example folder to .azureml and replace the config.json with your downloaded config.json. If you would prefer to migrate the information manually refer to the guidance below.
+
 Create a .azureml/config.json file in the project's root directory that looks like so:
 ```json
 {
