@@ -84,43 +84,6 @@ Here's an example of a possible config file:
 {
     "step1":
     {
-        "type": "PythonScriptStep",
-        "name": "process all files step",
-        "script": "process_all_files.py",
-        "input_datareference_path": "",
-        "input_datareference_name": "raw_input_data",
-        "input_dataset_name": "raw_input_data",
-        "source_directory": "src/first_preprocess/",
-        "arguments": ["--remote_run",
-        "--input_path", "input/",
-        "--output_path", "normalized_data"],
-        "requirements": "src/first_preprocess/preprocess_requirements.txt",
-        "node_count": 1,
-        "processes_per_node": 1
-    },
-    "step2":
-    {
-        "type": "PythonScriptStep",
-        "name": "prepare files step",
-        "script": "prepare_files.py",
-        "input_datareference_path": "normalized_data/",
-        "input_datareference_name": "normalized_data_conditioned",
-        "input_dataset_name": "normalizeddataconditioned",
-        "source_directory": "src/second_preprocess",
-        "arguments": ["split_train_val",
-        "patch",
-        "--label_file", "label.npy",
-        "--output_dir", "splits/",
-        "--stride=25",
-        "--patch=100.",
-        "--log_config", "configs/logging.conf"],
-        "requirements": "src/second_preprocess/prepare_files_requirements.txt",
-        "node_count": 1,
-        "processes_per_node": 1,
-        "base_image": "pytorch/pytorch"
-    },
-    "step3":
-    {
         "type": "MpiStep",
         "name": "train step",
         "script": "train.py",
