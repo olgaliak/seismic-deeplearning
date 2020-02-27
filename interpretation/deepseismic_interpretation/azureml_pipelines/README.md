@@ -29,11 +29,11 @@ You will need the following files to complete an run in AzureML
 - [cancel_run.py](dev/cancel_run.py) This script is used to cancel an AzureML train pipeline run
 - [base_pipeline.py](base_pipeline.py) This script is used as a base class and train_pipeline.py inherits from it. This is intended to be a helpful abstraction that an an future addition of an inference pipeline can leverage
 - [train_pipeline.py](train_pipeline.py) This script inherts from base_pipeline.py and is used to construct the pipeline and its steps. The script kickoff_train_pipeline.py will call the function defined here and the pipeline_config
-- [pipeline_config.json](pipeline_config.json) This config specifies the steps of the pipeline, location of data, and any specific arguments. This is consumed once the kickoff_train_script.py is run
+- [pipeline_config.json](pipeline_config.json) This pipeline configuration specifies the steps of the pipeline, location of data, and any specific arguments. This is consumed once the kickoff_train_script.py is run
 - [train.py](../../../experiments/interpretation/dutchf3_patch/local/train.py) This is the training script that is used to train the model
 - [unet.yaml](../../../experiments/interpretation/dutchf3_patch/local/configs/unet.yaml) This config specifices the model configuration to be used in train.py and is referenced in the pipeline_config.json
 - [azureml_requirements.txt](../../../experiments/interpretation/dutchf3_patch/local/azureml_requirements.txt) This file holds all dependencies for train.py so they can be installed on the compute in Azure ML
-- [logging.config](../../../experiments/interpretation/dutchf3_patch/local/logging.config) This config is used to set up logging
+- [logging.config](../../../experiments/interpretation/dutchf3_patch/local/logging.config) This logging config is used to set up logging
 - local environment with cv_lib and interpretation set up using guidance [here](../../../README.md)
 
 ## Running a Pipeline in AzureML
@@ -79,7 +79,7 @@ At the ROOT of this repo you will find an example [here](../../../.azureml.examp
 
 
 ## Training Pipeline
-Here's an example of a possible config file:
+Here's an example of a possible pipeline configuration file:
 ```json
 {
     "step1":
@@ -104,11 +104,11 @@ Here's an example of a possible config file:
   
 If you want to create a train pipeline:
 1) All of your steps are isolated
-    - Your scripts will need to conform to the interface you define in the config file
+    - Your scripts will need to conform to the interface you define in the pipeline configuration file
         - I.e., if step1 is expected to output X and step 2 is expecting X as an input, your scripts need to reflect that
     - If one of your steps has pip package dependencies, make sure it's specified in a requirements.txt file
     - If your script has local dependencies (i.e., is importing from another script) make sure that all dependencies fall underneath the source_directory
-2) You have configured your config file to specify the steps needed (see the section below "Configuring a Pipeline" for guidance)
+2) You have configured your pipeline configuration file to specify the steps needed (see the section below "Configuring a Pipeline" for guidance)
 
 Note: the following arguments are automatically added to any script steps by AzureML:
 ```--input_data``` and ```--output``` (if output is specified in the pipeline_config.json)
@@ -161,7 +161,7 @@ Kick off the training pipeline defined in your config via your python environmen
 ```python
 from src.azml.train_pipeline.train_pipeline import TrainPipeline
 
-orchestrator = TrainPipeline("<path to your config file>")
+orchestrator = TrainPipeline("<path to your pipeline configuration file>")
 orchestrator.construct_pipeline()
 run = orchestrator.run_pipeline(experiment_name="DEV-train-pipeline")
 ```
