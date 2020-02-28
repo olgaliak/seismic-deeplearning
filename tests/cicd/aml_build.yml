@@ -32,16 +32,19 @@ jobs:
       ls
       git branch
       uname -ra
-      
+
+      # setup run environment
       ./scripts/env_reinstall.sh 
+
       # use hardcoded root for now because not sure how env changes under ADO policy
       DATA_ROOT="/home/alfred/data_dynamic"
       ./tests/cicd/src/scripts/get_data_for_builds.sh ${DATA_ROOT}
 
-      # copy your pre-trained model files like so - using dummy file to illustrate
+      # upload pre-processed data to AML build WASB storage - overwrites by default and auto-creates container name
       azcopy --quiet --recursive \
         --source ${DATA_ROOT}/dutch_f3/data --destination https://$(amlbuildstore).blob.core.windows.net/amlbuild/data \
         --dest-key $(amlbuildstorekey)
+
 
 - job: AML_pipeline_tests
   dependsOn: setup
@@ -52,7 +55,10 @@ jobs:
   steps:
   - bash: |      
       source activate seismic-interpretation
-      # TODO: add job which launches your pytest files
+      # TODO: add code which launches your pytest files ("pytest sometest" OR "python test.py")
+      # data is in  $(amlbuildstore).blob.core.windows.net/amlbuild/data (container amlbuild, virtual folder data)
+      # storage key is $(amlbuildstorekey)
+
 
 - job: AML_short_pipeline_test
   dependsOn: setup
@@ -65,3 +71,4 @@ jobs:
       source activate seismic-interpretation
       # TODO: OPTIONAL! Add a job which launches entire training pipeline for 1 epoch of training (train model for single epoch)
       # if you don't want this then delete the entire job from this file
+
