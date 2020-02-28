@@ -144,17 +144,29 @@ To prepare the data for the experiments (e.g. split into train/val/test), please
 cd scripts
 
 # For section-based experiments
-python prepare_dutchf3.py split_train_val section --data-dir=${data_dir}/data
+python prepare_dutchf3.py split_train_val section --data_dir=${data_dir} --label_file=train/train_labels.npy --output_dir=splits
 
 
 # For patch-based experiments
-python prepare_dutchf3.py split_train_val patch --data-dir=${data_dir}/data --stride=50 --patch=100
+python prepare_dutchf3.py split_train_val patch --data_dir=${data_dir} --label_file=train/train_labels.npy --output_dir=splits \
+--stride=50 --patch_size=100
 
 # go back to repo root
 cd ..
 ```
 
 Refer to the script itself for more argument options.
+
+#### Bring your own SEG-Y data
+
+If you want to train these models using your own seismic and label data, the files will need to be prepped and
+converted to npy files. Typically, the [segyio](https://pypi.org/project/segyio/) can be used to open SEG-Y files that follow the standard, but more often than not, there are non standard settings or missing traces that will cause segyio to fail. If this happens with your data, read these notebooks and scripts to help prepare your data files:
+
+* [SEG-Y Data Prep README](contrib/segyconverter/README.md)
+* [convert_segy.py utility](contrib/segyconverter/convert_segy.py) - Utility script that can read SEG-Y files with unusual byte header locations and missing traces
+* [segy_convert_sample notebook](contrib/segyconverter/segy_convert_sample.ipynb) - Details on SEG-Y data conversion
+* [segy_sample_files notebook](contrib/segyconverter/segy_sample_files.ipynb) - Create test SEG-Y files that describe the scenarios that may cause issues when converting the data to numpy arrays
+
 
 ### Run Examples
 
@@ -236,24 +248,24 @@ Below are the results from the models contained in this repo. To run them check 
 
 #### Netherlands F3
 
-|    Source        |    Experiment                     |    PA       |    FW IoU    |    MCA     |
-|------------------|-----------------------------------|-------------|--------------|------------|
-|    Alaudah et al.|    Section-based                  |    0.905    |    0.817     |    .832    |
-|                  |    Patch-based                    |    0.852    |    0.743     |    .689    |
-|    DeepSeismic   |    Patch-based+fixed              |    .869     |    .761      |    .775    |
-|                  |    SEResNet UNet+section depth    |    .917     |    .849      |    .834    |
-|                  |    HRNet(patch)+patch_depth       |    .908     |    .843      |    .837    |
-|                  |    HRNet(patch)+section_depth     |    .928     |    .871      |    .871    |
+|    Source        |    Experiment                     |    PA       |    FW IoU    |    MCA     |   V100 (16GB) training time |
+|------------------|-----------------------------------|-------------|--------------|------------|-----------------------------|
+|    Alaudah et al.|    Section-based                  |    0.905    |    0.817     |    .832    |              N/A            |
+|                  |    Patch-based                    |    0.852    |    0.743     |    .689    |              N/A            |
+|    DeepSeismic   |    Patch-based+fixed              |    .875     |    .784      |    .740    |            08h 54min        |
+|                  |    SEResNet UNet+section depth    |    .910     |    .841      |    .809    |            55h 02min        |
+|                  |    HRNet(patch)+patch_depth       |    .884     |    .795      |    .739    |            67h 41min        |
+|                  |    HRNet(patch)+section_depth     |    .900     |    .820      |    .767    |            55h 08min        |
 
 #### Penobscot
 
 Trained and tested on the full dataset. Inlines with artifacts were left in for training, validation and testing.
 The dataset was split 70% training, 10% validation and 20% test. The results below are from the test set
 
-|    Source        |    Experiment                       |    PA       |    IoU       |    MCA     |
-|------------------|-------------------------------------|-------------|--------------|------------|
-|    DeepSeismic   |    SEResNet UNet + section depth    |    1.0      |    .98        |    .99    |
-|                  |    HRNet(patch) + section depth     |    1.0      |    .97        |    .98    |
+|    Source        |    Experiment                       |    PA       |    mIoU      |    MCA     |   V100 (16GB) training time |
+|------------------|-------------------------------------|-------------|--------------|------------|-----------------------------|
+|    DeepSeismic   |    SEResNet UNet + section depth    |    0.72     |    .35       |    .47     |          92h 59min          |
+|                  |    HRNet(patch) + section depth     |    0.91     |    .75       |    .85     |          80h 50min          |
 
 ![Best Penobscot SEResNet](assets/penobscot_seresnet_best.png "Best performing inlines, Mask and Predictions from SEResNet")
 ![Worst Penobscot SEResNet](assets/penobscot_seresnet_worst.png "Worst performing inlines  Mask and Predictions from SEResNet")
@@ -298,6 +310,8 @@ This project has adopted the [Microsoft Open Source Code of Conduct](https://ope
 | **Core Tests** | master | [![Build Status](https://dev.azure.com/best-practices/deepseismic/_apis/build/status/microsoft.Tests%20(seismic-deeplearning)?branchName=master)](https://dev.azure.com/best-practices/deepseismic/_build/latest?definitionId=126&branchName=master) |
 | **Notebook Tests** | staging | [![Build Status](https://dev.azure.com/best-practices/deepseismic/_apis/build/status/microsoft.Notebooks%20(seismic-deeplearning)?branchName=staging)](https://dev.azure.com/best-practices/deepseismic/_build/latest?definitionId=125&branchName=staging) |
 | **Notebook Tests** | master | [![Build Status](https://dev.azure.com/best-practices/deepseismic/_apis/build/status/microsoft.Notebooks%20(seismic-deeplearning)?branchName=master)](https://dev.azure.com/best-practices/deepseismic/_build/latest?definitionId=125&branchName=master) |
+| **Azure ML Tests** | staging | TODO add badge link |
+| **Azure ML Tests** | master | TODO add badge link |
 
 
 # Troubleshooting
@@ -409,7 +423,6 @@ which will indicate that anaconda folder is __/anaconda__. We'll refer to this l
   5. Navigate back to the Virtual Machine view in Step 2 and click the Start button to start the virtual machine.
 
 </details>
-
 
 
 
