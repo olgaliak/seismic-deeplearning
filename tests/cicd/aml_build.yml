@@ -32,23 +32,36 @@ jobs:
       ls
       git branch
       uname -ra
-
-      # ENABLE ALL FOLLOWING CODE WHEN YOU'RE READY TO ADD AML BUILD - disabled right now
-      # ./scripts/env_reinstall.sh 
+      
+      ./scripts/env_reinstall.sh 
       # use hardcoded root for now because not sure how env changes under ADO policy
-      # DATA_ROOT="/home/alfred/data_dynamic"
-      # ./tests/cicd/src/scripts/get_data_for_builds.sh ${DATA_ROOT}
-      # copy your model files like so - using dummy file to illustrate
-      # azcopy --quiet --source:https://$(storagename).blob.core.windows.net/models/model --source-key $(storagekey) --destination /home/alfred/models/your_model_name
+      DATA_ROOT="/home/alfred/data_dynamic"
+      ./tests/cicd/src/scripts/get_data_for_builds.sh ${DATA_ROOT}
 
-- job: AML_job_placeholder
+      # copy your pre-trained model files like so - using dummy file to illustrate
+      azcopy --quiet --recursive \
+        --source ${DATA_ROOT}/dutch_f3/data --destination https://$(amlbuildstore).blob.core.windows.net/amlbuild/data \
+        --dest-key $(amlbuildstorekey)
+
+- job: AML_pipeline_tests
   dependsOn: setup
   timeoutInMinutes: 5
-  displayName: AML job placeholder
+  displayName: AML pipeline tests
   pool:
     name: deepseismicagentpool
   steps:
-  - bash: |
-      # UNCOMMENT THIS WHEN YOU HAVE UNCOMMENTED THE SETUP JOB
-      # source activate seismic-interpretation
-      echo "TADA!!"
+  - bash: |      
+      source activate seismic-interpretation
+      # TODO: add job which launches your pytest files
+
+- job: AML_short_pipeline_test
+  dependsOn: setup
+  timeoutInMinutes: 5
+  displayName: AML short pipeline test
+  pool:
+    name: deepseismicagentpool
+  steps:
+  - bash: |      
+      source activate seismic-interpretation
+      # TODO: OPTIONAL! Add a job which launches entire training pipeline for 1 epoch of training (train model for single epoch)
+      # if you don't want this then delete the entire job from this file
