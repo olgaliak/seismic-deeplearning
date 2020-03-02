@@ -15,20 +15,14 @@ class TestTrainPipelineIntegration:
     Class used for testing the training pipeline
     """
     global test_data
-    test_data = {"step1": {"type": "PythonScriptStep",
-                           "name": "data preprocessing step",
-                           "script": "standin_preprocess.py",
-                           "output": "preprocessed_data",
-                           "input_datareference_path": "input/",
-                           "input_datareference_name": "training_data",
-                           "input_dataset_name": "cggtraindata",
-                           "source_directory": "src/dataprocessing",
-                           "arguments": []},
-                 "step2": {"type": "MpiStep",
+    test_data = {"step1": {"type": "MpiStep",
                            "name": "train step",
                            "script": "train.py",
-                           "source_directory": "src/azml/train_pipeline",
-                           "arguments": ["--num_epochs", 10],
+                           "input_datareference_path": "data/",
+                           "input_datareference_name": "training_data", 
+                           "input_dataset_name": "f3_data",
+                           "source_directory": "experiments/interpretation/dutchf3_patch/local",
+                           "arguments": ["TRAIN.END_EPOCH", "1"],
                            "requirements": "requirements.txt",
                            "node_count": 1,
                            "processes_per_node": 1}}
@@ -43,7 +37,7 @@ class TestTrainPipelineIntegration:
     def test_train_pipeline_expected_inputs_submits_correctly(self):
         # arrange
         self._setup_test_config()
-        orchestrator = TrainPipeline("interpretation/tests/example_config.json")
+        orchestrator = TrainPipeline("interpretation/tests/example_config.json") #updated this to be an example of our configh
         # act
         orchestrator.construct_pipeline()
         self.run = orchestrator.run_pipeline(experiment_name="TEST-train-pipeline")
@@ -53,18 +47,12 @@ class TestTrainPipelineIntegration:
 
     @pytest.mark.parametrize("step,missing_dependency", [("step1", "name"),
                                                          ("step1", "type"),
-                                                         ("step1", "arguments"),
-                                                         ("step1", "script"),
-                                                         ("step1", "output"),
                                                          ("step1", "input_datareference_name"),
                                                          ("step1", "input_datareference_path"),
                                                          ("step1", "input_dataset_name"),
                                                          ("step1", "source_directory"),
-                                                         ("step2", "type"),
-                                                         ("step2", "name"),
-                                                         ("step2", "source_directory"),
-                                                         ("step2", "script"),
-                                                         ("step2", "arguments"),
+                                                         ("step1", "script"),
+                                                         ("step1", "arguments"),
                                                          ])
     def test_missing_dependency_in_config_throws_error(self, step, missing_dependency):
         # iterates throw all config dependencies leaving them each out
