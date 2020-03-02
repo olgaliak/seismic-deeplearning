@@ -55,8 +55,9 @@ jobs:
   steps:
   - task: AZURECLI@2
     inputs:
-      scriptType: bash
-  -   bash: |      
+      scriptType: 'bash'
+      scriptLocation: 'inlineScript'
+      inlineScript: |      
         source activate seismic-interpretation
         # TODO: add code which launches your pytest files ("pytest sometest" OR "python test.py")
         # data is in  $(amlbuildstore).blob.core.windows.net/amlbuild/data (container amlbuild, virtual folder data)
