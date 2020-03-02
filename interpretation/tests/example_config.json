@@ -4,16 +4,17 @@
         "type": "MpiStep",
         "name": "train step",
         "script": "train.py",
-        "input_datareference_path": "normalized_data/",
-        "input_datareference_name": "normalized_data_conditioned",
-        "input_dataset_name": "normalizeddataconditioned",
+        "input_datareference_path": "data/",
+        "input_datareference_name": "ds_test",
+        "input_dataset_name": "deepseismic_test_dataset",
         "source_directory": "experiments/interpretation/dutchf3_patch/local",
         "arguments": [
-                      "--train_data_paths", "conditioned/listric1", "conditioned/listric5", 
-                      "--label_paths", "faults/listric1", "faults/listric5",
-                      "--splits_paths", "splits/listric1", "splits/listric5"
+                      "--cfg", "configs/unet.yaml",
+                      "TRAIN.END_EPOCH", "1",
+                      "TRAIN.SNAPSHOTS", "1", 
+                      "DATASET.ROOT", "data"
                       ],
-        "requirements": "interpretation/requirements.txt",
+        "requirements": "experiments/interpretation/dutchf3_patch/local/azureml_requirements.txt",
         "node_count": 1,
         "processes_per_node": 1,
         "base_image": "pytorch/pytorch"
