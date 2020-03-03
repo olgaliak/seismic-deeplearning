@@ -101,3 +101,4 @@ jobs:
 #       # if you don't want this then delete the entire job from this file
 #       python interpretation/deepseismic_interpretation/azureml_pipelines/dev/kickoff_train_pipeline.py --experiment=DEV-train-pipeline-name --orchestrator_config=orchestrator_config="interpretation/deepseismic_interpretation/azureml_pipelines/pipeline_config.json"
 
+
