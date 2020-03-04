@@ -17,20 +17,12 @@ jobs:
 
 # partially disable setup for now - done manually on build VM
 - job: setup
-  timeoutInMinutes: 10  
+  timeoutInMinutes: 10
+  displayName: Setup
   pool:
-    name: deepseismicagentpool  
+    name: deepseismicagentpool
   steps:
-  - task: AZURECLI@2
-    displayName: Setup
-    env:
-      BLOB_ACCOUNT_NAME: $(amlbuildstore)
-      BLOB_CONTAINER_NAME: "amlbuild"
-      BLOB_ACCOUNT_KEY: $(amlbuildstorekey)
-    inputs:
-      scriptType: 'bash'
-      scriptLocation: 'inlineScript'
-      inlineScript: |  
+    - bash: |
         # terminate as soon as any internal script fails
         set -e
 
@@ -51,6 +43,10 @@ jobs:
         azcopy --quiet --recursive \
           --source ${DATA_ROOT}/dutch_f3/data --destination https://${BLOB_ACCOUNT_NAME}.blob.core.windows.net/${BLOB_CONTAINER_NAME}/data \
           --dest-key ${BLOB_ACCOUNT_KEY}
+      env:
+        BLOB_ACCOUNT_NAME: $(amlbuildstore)
+        BLOB_CONTAINER_NAME: "amlbuild"
+        BLOB_ACCOUNT_KEY: $(amlbuildstorekey)
 
 
 - job: AML_pipeline_tests
