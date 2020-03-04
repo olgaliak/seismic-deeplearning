@@ -71,7 +71,7 @@ jobs:
         "workspace_name": "$WORKSPACE_NAME"
       }
       EOF
-      pytest interpretation/deepseismic_interpretation/tests/test_train_pipeline.py || EXITCODE=123
+      pytest interpretation/tests/test_train_pipeline.py || EXITCODE=123
       exit $EXITCODE
     env:
       SUB_ID: $(subscription_id)
