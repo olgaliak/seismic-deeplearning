@@ -51,7 +51,7 @@ jobs:
 
 - job: AML_pipeline_tests
   dependsOn: setup
-  timeoutInMinutes: 10
+  timeoutInMinutes: 20
   displayName: AML pipeline tests
   pool:
     name: deepseismicagentpool
@@ -63,8 +63,8 @@ jobs:
       # storage key is $(amlbuildstorekey)
       az --version
       az account show
-      az login --service-principal -u $(spidentity) -p $(spsecret) --tenant $(sptenant)
-      az account set --subscription $(subscriptionid)
+      az login --service-principal -u $SPIDENTITY -p $SPECRET --tenant $SPTENANT
+      az account set --subscription $SUB_ID
       mkdir .azureml
       cat <<EOF > .azureml/config.json
       {
@@ -88,6 +88,9 @@ jobs:
       AML_COMPUTE_CLUSTER_MIN_NODES: "1"
       AML_COMPUTE_CLUSTER_MAX_NODES: "8"
       AML_COMPUTE_CLUSTER_SKU: "STANDARD_NC6"
+      SPIDENTITY: $(spidentity)
+      SPECRET: $(spsecret)
+      SPTENANT: $(sptenant)
     displayName: 'integration tests'
 
 # - job: AML_short_pipeline_test
