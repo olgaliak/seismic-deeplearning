@@ -17,36 +17,40 @@ jobs:
 
 # partially disable setup for now - done manually on build VM
 - job: setup
-  timeoutInMinutes: 10
-  displayName: Setup
+  timeoutInMinutes: 10  
   pool:
-    name: deepseismicagentpool
-  env:      
+    name: deepseismicagentpool  
+  steps:
+  - task: AZURECLI@2
+    displayName: Setup
+    env:
       BLOB_ACCOUNT_NAME: $(amlbuildstore)
       BLOB_CONTAINER_NAME: "amlbuild"
       BLOB_ACCOUNT_KEY: $(amlbuildstorekey)
-  steps:
-  - bash: |
-      # terminate as soon as any internal script fails
-      set -e
+    inputs:
+      scriptType: 'bash'
+      scriptLocation: 'inlineScript'
+      inlineScript: |  
+        # terminate as soon as any internal script fails
+        set -e
 
-      echo "Running setup..."
-      pwd
-      ls
-      git branch
-      uname -ra
+        echo "Running setup..."
+        pwd
+        ls
+        git branch
+        uname -ra
 
-      # setup run environment
-      ./scripts/env_reinstall.sh 
+        # setup run environment
+        ./scripts/env_reinstall.sh 
 
-      # use hardcoded root for now because not sure how env changes under ADO policy
-      DATA_ROOT="/home/alfred/data_dynamic"
-      ./tests/cicd/src/scripts/get_data_for_builds.sh ${DATA_ROOT}
+        # use hardcoded root for now because not sure how env changes under ADO policy
+        DATA_ROOT="/home/alfred/data_dynamic"
+        ./tests/cicd/src/scripts/get_data_for_builds.sh ${DATA_ROOT}
 
-      # upload pre-processed data to AML build WASB storage - overwrites by default and auto-creates container name
-      azcopy --quiet --recursive \
-        --source ${DATA_ROOT}/dutch_f3/data --destination https://${BLOB_ACCOUNT_NAME}.blob.core.windows.net/${BLOB_CONTAINER_NAME}/data \
-        --dest-key ${BLOB_ACCOUNT_KEY}
+        # upload pre-processed data to AML build WASB storage - overwrites by default and auto-creates container name
+        azcopy --quiet --recursive \
+          --source ${DATA_ROOT}/dutch_f3/data --destination https://${BLOB_ACCOUNT_NAME}.blob.core.windows.net/${BLOB_CONTAINER_NAME}/data \
+          --dest-key ${BLOB_ACCOUNT_KEY}
 
 
 - job: AML_pipeline_tests
