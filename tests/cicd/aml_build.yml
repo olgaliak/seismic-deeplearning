@@ -51,32 +51,28 @@ jobs:
 
 - job: AML_pipeline_tests
   dependsOn: setup
-  timeoutInMinutes: 5
+  timeoutInMinutes: 10
   displayName: AML pipeline tests
   pool:
     name: deepseismicagentpool
   steps:
-  - task: AZURECLI@2
-    inputs:
-      scriptType: 'bash'
-      scriptLocation: 'inlineScript'
-      inlineScript: |      
-        source activate seismic-interpretation
-        # TODO: add code which launches your pytest files ("pytest sometest" OR "python test.py")
-        # data is in  $(amlbuildstore).blob.core.windows.net/amlbuild/data (container amlbuild, virtual folder data)
-        # storage key is $(amlbuildstorekey)
-        az --version
-        az account show
-        mkdir .azureml
-        cat <<EOF > .azureml/config.json
-        {
-          "subscription_id": "$SUB_ID",
-          "resource_group": "$RESOURCE_GROUP",
-          "workspace_name": "$WORKSPACE_NAME"
-        }
-        EOF
-        pytest interpretation/deepseismic_interpretation/tests/test_train_pipeline.py || EXITCODE=123
-        exit $EXITCODE
+  - bash: |      
+      source activate seismic-interpretation
+      # TODO: add code which launches your pytest files ("pytest sometest" OR "python test.py")
+      # data is in  $(amlbuildstore).blob.core.windows.net/amlbuild/data (container amlbuild, virtual folder data)
+      # storage key is $(amlbuildstorekey)
+      az --version
+      az account show
+      mkdir .azureml
+      cat <<EOF > .azureml/config.json
+      {
+        "subscription_id": "$SUB_ID",
+        "resource_group": "$RESOURCE_GROUP",
+        "workspace_name": "$WORKSPACE_NAME"
+      }
+      EOF
+      pytest interpretation/deepseismic_interpretation/tests/test_train_pipeline.py || EXITCODE=123
+      exit $EXITCODE
     env:
       SUB_ID: $(subscription_id)
       RESOURCE_GROUP: $(resource_group)
