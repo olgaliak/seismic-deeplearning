@@ -51,7 +51,7 @@ jobs:
 
 - job: AML_pipeline_tests
   dependsOn: setup
-  timeoutInMinutes: 10
+  timeoutInMinutes: 40
   displayName: AML pipeline tests
   pool:
     name: deepseismicagentpool
