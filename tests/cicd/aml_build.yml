@@ -51,7 +51,7 @@ jobs:
 
 - job: AML_pipeline_tests
   dependsOn: setup
-  timeoutInMinutes: 40
+  timeoutInMinutes: 20
   displayName: AML pipeline tests
   pool:
     name: deepseismicagentpool
@@ -73,6 +73,7 @@ jobs:
       EOF
       pytest interpretation/tests/test_train_pipeline.py || EXITCODE=123
       exit $EXITCODE
+      pytest
     env:
       SUB_ID: $(subscription_id)
       RESOURCE_GROUP: $(resource_group)
