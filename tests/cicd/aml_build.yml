@@ -51,7 +51,7 @@ jobs:
 
 - job: AML_pipeline_tests
   dependsOn: setup
-  timeoutInMinutes: 20
+  timeoutInMinutes: 10
   displayName: AML pipeline tests
   pool:
     name: deepseismicagentpool
@@ -63,6 +63,8 @@ jobs:
       # storage key is $(amlbuildstorekey)
       az --version
       az account show
+      az login --service-principal -u $(spidentity) -p $(spsecret) --tenant $(sptenant)
+      az account set --subscription $(subscriptionid)
       mkdir .azureml
       cat <<EOF > .azureml/config.json
       {
